@@ -84,14 +84,20 @@ class Bingo extends Component {
     });
   }
 
+  toggleChosen = (row, col) => {
+    const { rows } = this.state;
+    rows[row][col].chosen = !rows[row][col].chosen;
+    this.setState({rows})
+  }
+
   render() {
     const { rows } = this.state;
     return (
       <div>
-        <h1>Partileder?-bingo</h1>
+        <H1>Partileder?-bingo</H1>
         <Board>
           <tbody>
-            {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} /> )}
+            {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={this.toggleChosen} /> )}
           </tbody>
         </Board>
         

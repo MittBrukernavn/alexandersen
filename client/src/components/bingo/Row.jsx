@@ -1,17 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
 
 import Tile from './Tile.jsx';
 
 const Row = props => {
-  const { data, rowIndex } = props;
-  const Wrap = styled.tr`
-    min-height: 8em;
-  `;
+  const { data, rowIndex, toggle } = props;
   return (
-    <Wrap>
-      {data.map((tile, columnIndex) => <Tile key={columnIndex} data={tile} columnIndex={columnIndex} />)}
-    </Wrap>
+    <tr>
+      {data.map((tile, columnIndex) => <Tile key={columnIndex} data={tile} rowIndex={rowIndex} columnIndex={columnIndex} toggle={toggle} />)}
+    </tr>
   );
 }
 

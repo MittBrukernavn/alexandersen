@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Tile = props => {
-  const { data, columnIndex } = props;
+  const { data, toggle, rowIndex, columnIndex } = props
   const { text, chosen } = data; 
   const Wrapper = styled.td`
     background-color: ${chosen ? 'green' : 'white'};
@@ -12,7 +12,7 @@ const Tile = props => {
   `
   
   return (
-    <Wrapper>
+    <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
       {text}
     </Wrapper>
   )
