@@ -9,7 +9,8 @@ const Tile = props => {
     border: 1px solid black;
     min-width: 8em;
     padding: 0.5em;
-  `
+    text-align: center;
+  `;
   
   return (
     <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
