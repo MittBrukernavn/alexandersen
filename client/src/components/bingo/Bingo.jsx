@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Row from './Row.jsx';
 
 const H1 = styled.h1`
-  margin: auto;
+  text-align: center;
 `;
 
 const Board = styled.table`
@@ -12,6 +12,7 @@ const Board = styled.table`
   border: 1px solid black;
   word-wrap: break-word;
   border-collapse: collapse;
+  min-height: 75vh;
 `;
 
 class Bingo extends Component {
@@ -55,33 +56,20 @@ class Bingo extends Component {
     freeSpace: 'Noen lyver'
   }
 
-  componentDidMount() {
-    const { allPrompts, freeSpace } = this.state;
-    // Fisher-yates shuffle
-    for(let i = allPrompts.length - 1; i >= 0; i--) {
-      let j = Math.floor(Math.random()*(i+1));
-      let c = allPrompts[i];
-      allPrompts[i] = allPrompts[j];
-      allPrompts[j] = c;
-    }
-    const rows = [];
-    for(let i = 0; i < 5; i++) {
-      const row = [];
-      for(let j = 0; j < 5; j++) {
-        row.push({
-          text: allPrompts[5*i + j],
-          chosen: false
-        });
+  async componentDidMount() {
+    const req = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
-      rows.push(row);
-    }
-    rows[2][2] = {
-      text: freeSpace,
-      chosen: true
     };
+    const res = await fetch('/api/bingo/1', req);
+    const { rows } = await res.json();
+
     this.setState({
       rows
     });
+
   }
 
   toggleChosen = (row, col) => {

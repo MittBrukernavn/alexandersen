@@ -21,3 +21,11 @@ client/.env.production.local
 client/npm-debug.log*
 client/yarn-debug.log*
 client/yarn-error.log*
+
+# backend:
+
+# dependencies
+api/node_modules
+
+# environment
+api/.env
