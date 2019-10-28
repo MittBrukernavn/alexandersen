@@ -5,6 +5,13 @@ import Row from './Row.jsx';
 
 const H1 = styled.h1`
   text-align: center;
+  font-size: 1.5em;
+  font-family: sans-serif;
+  & select {
+    font-size: 1.2em;
+    margin: 0;
+    height: 100%;
+  }
 `;
 
 const Board = styled.table`
@@ -17,72 +24,45 @@ const Board = styled.table`
 
 class Bingo extends Component {
   state = {
-    rows: [],
-    allPrompts: [
-      'Moxnes prøver å få en kommentar/et innlegg',
-      'Partileder nevner navn på partiet sitt',
-      '"Studenter"',
-      '"Det grønne skiftet"',
-      '"Jeg vil bare ha det sagt"',
-      'Svarer ikke på spørsmålet',
-      'Siv Jensen drikker vann',
-      'AP går over tiden',
-      'Venstre nevner noe radikalt',
-      'Whataboutism',
-      'Jubel fra salen etter et utspill',
-      'Fredrik Solvang får noen til å si noe de ikke ville',
-      'Kraftuttrykk ("Søren" e.l.)',
-      'Kommunesammenslåing',
-      'Metrobussen',
-      'Skolemat',
-      'Sentralisering',
-      'Fornavn',
-      'Buing fra salen',
-      'Verdensnyheter blir nevnt',
-      '"MEN..."',
-      'Gløshaugen',
-      'Pandering',
-      'Avsporing',
-      'Vi i partiet mener at...',
-      'Venstre nevner pelsdyrnæringen',
-      'Skattelette til de rikeste',
-      'Bestemor på anbud',
-      'MDG blander inn klima i noe helt urelatert',
-      'AP/FrP sier at de er miljøpartier',
-      'Jonas banner',
-      'Noen danser med en panda',
-      'Velferdsprofitører'
-    ],
-    freeSpace: 'Noen lyver'
+    index: 0,
+    bingoTypes: [],
+    rows: []
   }
 
   async componentDidMount() {
-    const req = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-    const res = await fetch('/api/bingo/1', req);
-    const { rows } = await res.json();
+    const res = await fetch('/api/bingo');
+    const { bingos } = await res.json();
+    this.setState({
+      bingoTypes: bingos
+    });
+  }
 
+  chooseBingo = async (e) => {
+    const id = parseInt(e.target.value);
+    this.setState({
+      index: id
+    });
+    const res = await fetch(`/api/bingo/${id}`);
+    const { rows } = await res.json();
     this.setState({
       rows
     });
-
   }
 
   toggleChosen = (row, col) => {
     const { rows } = this.state;
     rows[row][col].chosen = !rows[row][col].chosen;
-    this.setState({rows})
+    this.setState({rows});
   }
 
   render() {
-    const { rows } = this.state;
+    const { rows, bingoTypes, index } = this.state;
     return (
       <div>
-        <H1>Partileder?-bingo</H1>
+        <H1><select value={index} onChange={this.chooseBingo}>
+            {index === 0 ? <option value={0}>Velg en</option> : null}
+            {bingoTypes.map(({id, name}) => <option key={id} value={id}>{name}</option>)}
+          </select>-bingo</H1>
         <Board>
           <tbody>
             {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={this.toggleChosen} /> )}
