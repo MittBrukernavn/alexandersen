@@ -71,9 +71,9 @@ router.get('/:id', async (req, res) => {
     rows
   });
 });
-/*
+
 router.post('/', async (req, res) => {
-  const { name, freeSpace, allPrompts, token } = req.body;
+  const { name, freeSpace, description, allPrompts, token } = req.body;
   try {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY)
@@ -81,11 +81,16 @@ router.post('/', async (req, res) => {
     res.status(401).json({error:'Unauthorized'});
     return;
   }
-  const newBingo = { freeSpace, allPrompts };
-  const id = bingoList.length+1;
-  bingos.push(newBingo);
-  bingoList.push({id, name});
-  res.status(200).end();
+  const connection = await connectPool();
+  const insertRes = await connection.query('INSERT INTO Bingos(Name, FreeSpace, Description) VALUES (?,?,?)', [name,freeSpace,description]);
+  console.log('Insert res:')
+  console.log(insertRes);
+  const id = insertRes[0].insertId;
+  const newEntries = allPrompts.map(_=>`(${id}, ?)`);
+  const entryString = newEntries.join(',');
+  const newRes = await connection.query(`INSERT INTO Prompts(BingoID, PromptText) VALUES ${entryString}`, allPrompts);
+  connection.end();
+  res.status(200).json({status:'ok'});
 });
-*/
+
 module.exports = router;

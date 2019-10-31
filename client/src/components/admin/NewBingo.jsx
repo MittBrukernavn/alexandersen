@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  max-width: 50em;
+  margin: auto;
+  & input {
+    align-self:flex-start;
+  }
+  & * {
+    margin: 0.2em;
+  }
+`;
 
 const NewBingo = props => {
   const [name, setName] = useState('');
   const [freeSpace, setFreeSpace] = useState('');
   const [allPrompts, setAllPrompts] = useState('');
+  const [description, setDescription] = useState('');
 
   const submit = async () => {
     const allPromptsAsList = allPrompts.split('\n');
@@ -13,6 +28,7 @@ const NewBingo = props => {
       body: JSON.stringify({
         name,
         freeSpace,
+        description,
         allPrompts: allPromptsAsList,
         token
       }),
@@ -29,12 +45,13 @@ const NewBingo = props => {
   }
 
   return (
-    <div>
-      <input type="text" value={name} placeholder="Name" onChange={e=>setName(e.target.value)} /><br/>
-      <input type="text" value={freeSpace} placeholder="Free Space" onChange={e=>setFreeSpace(e.target.value)} /><br/>
-      <textarea value={allPrompts} onChange={e=>setAllPrompts(e.target.value)} /><br/>
+    <Wrapper>
+      <input type="text" value={name} placeholder="Name" onChange={e=>setName(e.target.value)} />
+      <input type="text" value={freeSpace} placeholder="Free Space" onChange={e=>setFreeSpace(e.target.value)} />
+      <textarea value={description} placeholder="Description" onChange={e=>setDescription(e.target.value)} />
+      <textarea value={allPrompts} placeholder="Prompts (one per line)" onChange={e=>setAllPrompts(e.target.value)} />
       <button type="button" onClick={submit}>Submit</button>
-    </div>
+    </Wrapper>
   );
 }
 

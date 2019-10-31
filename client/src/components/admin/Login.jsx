@@ -57,8 +57,8 @@ const Login = props => {
   
   return (
     <Wrapper>
-      <input type="text" placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} /> <br />
-      <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} /> <br />
+      <input type="text" placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
       <button type="button" onClick={submit}>Logg inn</button>
       {error ? (
         <Error>
