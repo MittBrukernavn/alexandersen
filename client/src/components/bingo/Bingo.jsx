@@ -30,7 +30,10 @@ class Bingo extends Component {
   }
 
   async componentDidMount() {
-    const res = await fetch('/api/bingo');
+    const U = new URL(window.location.href);
+    U.port=5000;
+    U.pathname='/api/bingo/';
+    const res = await fetch(U.href);
     const { bingos } = await res.json();
     this.setState({
       bingoTypes: bingos
@@ -42,7 +45,10 @@ class Bingo extends Component {
     this.setState({
       index: id
     });
-    const res = await fetch(`/api/bingo/${id}`);
+    const U = new URL(window.location.href);
+    U.port=5000;
+    U.pathname=`/api/bingo/$id`;
+    const res = await fetch(U.href);
     const { rows } = await res.json();
     this.setState({
       rows

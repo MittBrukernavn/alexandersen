@@ -26,11 +26,23 @@ const Tile = props => {
       onClick={() => toggle(rowIndex, columnIndex)}
       dangerouslySetInnerHTML={{__html: katex_string}}
     />;
-  } else {
-    return <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
-      {text}
-    </Wrapper>
+  } else if(text.indexOf('$')!==-1) {
+    let count = 0;
+    for(let i=0; i<text.length; i++) {
+      count+=text[i]==='$'
+    }
+    if(count%2===0) {
+      const texts = text.split('$');
+      return (
+        <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
+          {texts.map((t,i)=> i%2 ? <span dangerouslySetInnerHTML={{__html:katex.renderToString(t,{throwOnError: false})}} />:<span>{t}</span>)}
+        </Wrapper>
+      )
+    }
   }
+  return <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
+    {text}
+  </Wrapper>
 }
 
 export default Tile;

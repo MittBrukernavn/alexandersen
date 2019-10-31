@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 const bingos = [
   {
@@ -42,19 +43,19 @@ const bingos = [
   },
   {
     freeSpace: false,
-    allPrompts: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
-    21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
-    41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
-    61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,
-    81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99, '$$e^{i\\cdot\\pi} + 1$$'
+    allPrompts: ['1','2','3','4', '5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',
+    '21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40',
+    '41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60',
+    '61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80',
+    '81','82','83','84','85','86','87','88','89','90','91','92','93','94','95','96','97','98','99','$$e^{i\\cdot\\pi} + 1$$'
     ]
   },
   {
-    freeSpace: 'Buzzword',
+    freeSpace: '$Buzzwords^{\\infty}$',
     allPrompts: [
       'Nevner søknadsfrist',
       'Onboarding-program',
-      'Utdatert stack',
+      '$Utdatert$ stack',
       'Java-backend',
       'Nevner AI',
       'Nevner Blockchain',
@@ -83,12 +84,14 @@ const bingos = [
 ]
 
 
+const bingoList = [
+  {id: 1, name:'Partileder'},
+  {id: 2, name:'Helt Vanlig'},
+  {id: 3, name:'Bedpres/kurs'}
+];
+
 router.get('/', (req, res) => {
-  res.json({bingos: [
-    {id: 1, name:'Partileder'},
-    {id: 2, name:'Helt Vanlig'},
-    {id: 3, name:'Bedpres/kurs'}
-  ]});
+  res.json({bingos: bingoList});
 });
 
 router.get('/:id', (req, res) => {
@@ -127,6 +130,22 @@ router.get('/:id', (req, res) => {
   res.json({
     rows
   });
+});
+
+router.post('/', async (req, res) => {
+  const { name, freeSpace, allPrompts, token } = req.body;
+  try {
+    const { JWT_KEY } = process.env;
+    jwt.verify(token, JWT_KEY)
+  } catch (error) {
+    res.status(401).json({error:'Unauthorized'});
+    return;
+  }
+  const newBingo = { freeSpace, allPrompts };
+  const id = bingoList.length+1;
+  bingos.push(newBingo);
+  bingoList.push({id, name});
+  res.status(200).end();
 });
 
 module.exports = router;
