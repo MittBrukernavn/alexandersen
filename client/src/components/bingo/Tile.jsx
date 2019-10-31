@@ -35,7 +35,7 @@ const Tile = props => {
       const texts = text.split('$');
       return (
         <Wrapper onClick={() => toggle(rowIndex, columnIndex)}>
-          {texts.map((t,i)=> i%2 ? <span dangerouslySetInnerHTML={{__html:katex.renderToString(t,{throwOnError: false})}} />:<span>{t}</span>)}
+          {texts.map((t,i)=> i%2 ? <span key={i} dangerouslySetInnerHTML={{__html:katex.renderToString(t,{throwOnError: false})}} />:<span key={i}>{t}</span>)}
         </Wrapper>
       )
     }

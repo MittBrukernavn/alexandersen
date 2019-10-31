@@ -47,7 +47,7 @@ class Bingo extends Component {
     });
     const U = new URL(window.location.href);
     U.port=5000;
-    U.pathname=`/api/bingo/$id`;
+    U.pathname=`/api/bingo/${id}`;
     const res = await fetch(U.href);
     const { rows } = await res.json();
     this.setState({
