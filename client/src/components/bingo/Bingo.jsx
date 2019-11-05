@@ -58,7 +58,54 @@ class Bingo extends Component {
   toggleChosen = (row, col) => {
     const { rows } = this.state;
     rows[row][col].chosen = !rows[row][col].chosen;
+    this.checkForBingo();
     this.setState({rows});
+  }
+
+  checkForBingo = () => {
+    const { rows } = this.state;
+    for(let i = 0; i < rows.length; i++) {
+      const rowBingo = rows[i].reduce((current,next)=>current&&next.chosen, true);
+      rows[i].forEach(b=>b.bingo=rowBingo);
+    }
+    for(let j = 0; j < rows[0].length; j++) {
+      let colBingo=true;
+      for(let i = 0; i < rows.length; i++) {
+        if (!rows[i][j].chosen) {
+          colBingo=false;
+          break;
+        }
+      }
+      if(colBingo) {
+        for(let i = 0; i < rows.length; i++) {
+          rows[i][j].bingo=true;
+        }
+      }
+    }
+
+    // diagonal 1
+    let diag1 = true;
+    let diag2 = true;
+    for(let i = 0; i < rows.length; i++) {
+      if(!rows[i][i].chosen) {
+        diag1 = false;
+      }
+      const j = rows[i].length - 1 - i;
+      if(!rows[i][j].chosen) {
+        diag2 = false;
+      }
+    }
+    if (diag1) {
+      for (let i = 0; i < rows.length; i++) {
+        rows[i][i].bingo=true;
+      }
+    }
+    if (diag2) {
+      for (let i = 0; i < rows.length; i++) {
+        const j = rows[i].length - 1 - i;
+        rows[i][j].bingo=true;
+      }
+    }
   }
 
   render() {

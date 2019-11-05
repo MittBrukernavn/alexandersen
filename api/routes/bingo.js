@@ -55,7 +55,8 @@ router.get('/:id', async (req, res) => {
       for(let j = 0; j < 5; j++) {
         row.push({
           text: allPrompts[i + j].text,
-          chosen: false
+          chosen: false,
+          bingo: false
         });
       }
       rows.push(row);
@@ -63,7 +64,8 @@ router.get('/:id', async (req, res) => {
     if(freeSpace) {
       rows[2][2] = {
         text: `${freeSpace} (free space)`,
-        chosen: true
+        chosen: true,
+        bingo: false
       };
     }
   res.json({

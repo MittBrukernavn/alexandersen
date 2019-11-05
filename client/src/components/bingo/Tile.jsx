@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import katex from 'katex';
 
 const Tile = props => {
-  const { data, toggle, rowIndex, columnIndex } = props
-  const { text, chosen } = data; 
+  const { data, toggle, rowIndex, columnIndex } = props;
+  const { text, chosen, bingo } = data; 
   const Wrapper = styled.td`
-    background-color: ${chosen ? '#00ff00' : '#ffffff'};
+    ${chosen ? `background-color: ${bingo ? '#0000ff' : '#00ff00'};` : ''}
     border: 1px solid black;
     min-width: 3em;
     max-width: 15vw;
