@@ -1,7 +1,13 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Row from './Row.jsx';
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
 
 const H1 = styled.h1`
   text-align: center;
@@ -22,48 +28,37 @@ const Board = styled.table`
   min-height: 75vh;
 `;
 
-class Bingo extends Component {
-  state = {
-    index: 0,
-    bingoTypes: [],
-    rows: []
-  }
+const Bingo = props => {
+  const [index, setIndex] = useState(0);
+  const [bingoTypes, setBingoTypes] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [description, setDescription] = useState('');
 
-  async componentDidMount() {
-    const U = new URL(window.location.href);
-    U.port=5000;
-    U.pathname='/api/bingo/';
-    const res = await fetch(U.href);
-    const { bingos } = await res.json();
-    this.setState({
-      bingoTypes: bingos
-    });
-  }
+  useEffect(()=>{
+    const internal = async () => {
+      const U = new URL(window.location.href);
+      U.port=5000;
+      U.pathname='/api/bingo/';
+      const res = await fetch(U.href);
+      const { bingos } = await res.json();
+      setBingoTypes(bingos);
+    }
+    internal();
+  }, [])
 
-  chooseBingo = async (e) => {
+  const chooseBingo = async (e) => {
     const id = parseInt(e.target.value);
-    this.setState({
-      index: id
-    });
+    setIndex(id);
     const U = new URL(window.location.href);
     U.port=5000;
     U.pathname=`/api/bingo/${id}`;
     const res = await fetch(U.href);
-    const { rows } = await res.json();
-    this.setState({
-      rows
-    });
+    const { rows, description } = await res.json();
+    setRows(rows);
+    setDescription(description);
   }
 
-  toggleChosen = (row, col) => {
-    const { rows } = this.state;
-    rows[row][col].chosen = !rows[row][col].chosen;
-    this.checkForBingo();
-    this.setState({rows});
-  }
-
-  checkForBingo = () => {
-    const { rows } = this.state;
+  const checkForBingo = (rows) => {
     for(let i = 0; i < rows.length; i++) {
       const rowBingo = rows[i].reduce((current,next)=>current&&next.chosen, true);
       rows[i].forEach(b=>b.bingo=rowBingo);
@@ -108,23 +103,27 @@ class Bingo extends Component {
     }
   }
 
-  render() {
-    const { rows, bingoTypes, index } = this.state;
-    return (
-      <div>
-        <H1><select value={index} onChange={this.chooseBingo}>
-            {index === 0 ? <option value={0}>Velg en</option> : null}
-            {bingoTypes.map(({id, name}) => <option key={id} value={id}>{name}</option>)}
-          </select>-bingo</H1>
-        <Board>
-          <tbody>
-            {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={this.toggleChosen} /> )}
-          </tbody>
-        </Board>
-        
-      </div>
-    );
+  const toggleChosen = (row, col) => {
+    const rows_copy = [...rows];
+    rows_copy[row][col].chosen = !rows[row][col].chosen;
+    checkForBingo(rows_copy);
+    setRows(rows_copy);
   }
-}
+
+  return (
+    <Wrapper>
+      <H1><select value={index} onChange={chooseBingo}>
+          {index === 0 ? <option value={0}>Velg en</option> : null}
+          {bingoTypes.map(({id, name}) => <option key={id} value={id}>{name}</option>)}
+        </select>-bingo</H1>
+        <p>{description}</p>
+      <Board>
+        <tbody>
+          {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={toggleChosen} /> )}
+        </tbody>
+      </Board>
+    </Wrapper>
+  );
+};
 
 export default Bingo;
