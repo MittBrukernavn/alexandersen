@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const Table = styled.table`
   border: 1px solid black;
   border-collapse: collapse;
@@ -87,7 +93,7 @@ const Prompts = props => {
   }
 
   return (
-    <div>
+    <Wrapper>
       <select onChange={changeBingo}>
         {id === 0 ? <option value={0}>Velg bingo</option> : null}
         {bingos.map(({id,name})=><option key={id} value={id} onChange={changeBingo}>{name}</option>)}
@@ -115,7 +121,7 @@ const Prompts = props => {
         </div>
       ) : null
       }
-    </div>
+    </Wrapper>
   );
 };
 

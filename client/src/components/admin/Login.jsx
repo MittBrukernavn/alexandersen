@@ -52,7 +52,7 @@ const Login = props => {
   }
 
   if (status === 'ok') {
-    return <Redirect to="/admin/bingo" />
+    return <Redirect to="/admin/main" />
   }
   
   return (

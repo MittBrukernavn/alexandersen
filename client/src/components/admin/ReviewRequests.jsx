@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const ReviewRequests = props => {
   const [requests, setRequests] = useState([]);
@@ -61,30 +67,32 @@ const ReviewRequests = props => {
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Bingo</th>
-          <th>Prompt</th>
-          <th>Accept</th>
-          <th>Reject</th>
-        </tr>
-      </thead>
-      <tbody>
-        {requests.map(req => {
-          const {bingoName, id, promptText} = req;
-          return (
-            <tr key={id}>
-              <td>{bingoName}</td>
-              <td>{promptText}</td>
-              <td><button type="button" onClick={()=>accept(id)}>Accept</button></td>
-              <td><button type="button" onClick={()=>reject(id)}>Reject</button></td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  )
+    <Wrapper>
+      <table>
+        <thead>
+          <tr>
+            <th>Bingo</th>
+            <th>Prompt</th>
+            <th>Accept</th>
+            <th>Reject</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map(req => {
+            const {bingoName, id, promptText} = req;
+            return (
+              <tr key={id}>
+                <td>{bingoName}</td>
+                <td>{promptText}</td>
+                <td><button type="button" onClick={()=>accept(id)}>Accept</button></td>
+                <td><button type="button" onClick={()=>reject(id)}>Reject</button></td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </Wrapper>
+  );
 };
 
 export default ReviewRequests;

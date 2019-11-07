@@ -6,6 +6,8 @@ import Home from './components/home/Home.jsx';
 import Bingo from './components/bingo/Bingo.jsx';
 import BingoRequest from './components/bingo/BingoRequest.jsx';
 import Login from './components/admin/Login.jsx';
+
+import AdminPanel from './components/admin/AdminPanel.jsx';
 import NewBingo from './components/admin/NewBingo.jsx';
 import Prompts from './components/admin/Prompts.jsx';
 import ReviewRequests from './components/admin/ReviewRequests.jsx';
@@ -19,6 +21,7 @@ function App() {
       <Route path='/bingo/request' component={BingoRequest} />
       <Route path='/admin' exact component={()=><Redirect to='/admin/login' />} />
       <Route path='/admin/login' component={Login} />
+      <Route path='/admin/main' component={AdminPanel} />
       <Route path='/admin/bingo' component={NewBingo} />
       <Route path='/admin/prompts' component={Prompts} />
       <Route path='/admin/review' component={ReviewRequests} />

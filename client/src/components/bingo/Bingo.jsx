@@ -122,6 +122,8 @@ const Bingo = props => {
           {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={toggleChosen} /> )}
         </tbody>
       </Board>
+      <p>Har du lyst til å legge til flere felt til bingoen, kan du gjøre det <a href='/bingo/request'>her</a>
+      </p>
     </Wrapper>
   );
 };
