@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Tree from './Tree.jsx';
 
 const Wrapper = styled.div`
-  max-width: 60em;
+  max-width: 80vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,16 +19,16 @@ const InputField = styled.div`
 `;
 
 const ChristmasTree = () => {
-  const [maxDepth, setMaxDepth] = useState(3);
+  const [nodeCount, setNodeCount] = useState(3);
 
   return (
     <Wrapper>
       <InputField>
-        <label htmlFor='maxDepthIn' >
-          How many layers? <input id='maxDepthIn' value={maxDepth} onChange={e=>setMaxDepth(e.target.value)} />
+        <label htmlFor='nodeCountIn' >
+          How many nodes? <input id='nodeCountIn' value={nodeCount} onChange={e=>setNodeCount(e.target.value)} />
         </label>
       </InputField>
-      <Tree depth={1} maxDepth={maxDepth} />
+      {nodeCount > 0 ? <Tree depth={1} nodeCount={nodeCount} /> : null}
     </Wrapper>
   );
 }

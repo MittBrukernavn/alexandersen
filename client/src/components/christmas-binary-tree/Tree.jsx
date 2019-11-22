@@ -51,7 +51,10 @@ const Julekule = styled.circle`
 `;
 
 const Tree = props => {
-  const { depth, maxDepth } = props;
+  const { depth, nodeCount } = props;
+  const childNodes = nodeCount - 1;
+  const leftCount = Math.ceil(childNodes/2);
+  const rightCount = Math.floor(childNodes/2);
   return (
     <Wrapper>
       <BranchDiv>
@@ -69,10 +72,10 @@ const Tree = props => {
         </Svg>
       </BranchDiv>
       
-      {depth < maxDepth ? (
+      {leftCount > 0 ? (
         <RecursiveDiv>
-          <Tree depth={depth+1} maxDepth={maxDepth} />
-          <Tree depth={depth+1} maxDepth={maxDepth} />
+          <Tree depth={depth+1} nodeCount={leftCount} />
+          { rightCount > 0 ? <Tree depth={depth+1} nodeCount={rightCount} /> : <Wrapper />}
         </RecursiveDiv>
        ) : null}
     </Wrapper>
