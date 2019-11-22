@@ -46,28 +46,29 @@ router.get('/:id', async (req, res) => {
   }
   const { freeSpace, description } = bingoRes[0][0];
   const allPrompts = promptsRes[0];
+  let n = 5;
   if(allPrompts.length < 25) {
-
+    n = Math.floor(Math.sqrt(allPrompts.length));
   }
   const rows = [];
-    for(let i = 0; i < 25; i+=5) {
-      const row = [];
-      for(let j = 0; j < 5; j++) {
-        row.push({
-          text: allPrompts[i + j].text,
-          chosen: false,
-          bingo: false
-        });
-      }
-      rows.push(row);
-    }
-    if(freeSpace) {
-      rows[2][2] = {
-        text: `${freeSpace} (free space)`,
-        chosen: true,
+  for(let i = 0; i < n*n; i+=n) {
+    const row = [];
+    for(let j = 0; j < n; j++) {
+      row.push({
+        text: allPrompts[i + j].text,
+        chosen: false,
         bingo: false
-      };
+      });
     }
+    rows.push(row);
+  }
+  if(freeSpace) {
+    rows[Math.floor(n/2)][Math.floor(n/2)] = {
+      text: `${freeSpace} (free space)`,
+      chosen: true,
+      bingo: false
+    };
+  }
   res.json({
     description,
     rows
