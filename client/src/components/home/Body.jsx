@@ -14,11 +14,15 @@ const Wrapper = styled.div`
 
 const Body = props => (
   <Wrapper>
-    <h2>Bingo</h2>
+    <h2><a href='/christmastree'>Binary christmas tree</a></h2>
+    <p>
+      For Online's christmas workshop, someone had the bright idea of making a christmas binary tree 
+      (i.e. a christmas tree and a binary tree). I thought it sounded fun, and decided to make it a reality. Enjoy.
+    </p>
+    <h2><a href='/bingo'>Bingo</a></h2>
     <p>
       My first project published on the website was an old bingo project, from a debate earlier this year.
-      It can be found <a href='/bingo'>here</a>. I intend to expand on it later, 
-      probably allowing for user generated inputs and more sets to play with.
+      It has been expanded on slightly, allowing for some level of user generated content and with more bingo sets to play with.
     </p>
   </Wrapper>
 );
