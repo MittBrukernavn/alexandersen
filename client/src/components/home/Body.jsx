@@ -10,6 +10,8 @@ const Wrapper = styled.div`
   min-height: 20em;
   background-color: white;
   margin: auto;
+  border-radius: 2em;
+  padding: 0.5em;
 `;
 
 const Body = props => (
