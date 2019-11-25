@@ -24,7 +24,7 @@ const Card = styled.div`
 const A = styled.a`
   color: #2dd;
   text-decoration: none;
-`
+`;
 
 const pages = [
   {
@@ -39,7 +39,7 @@ const pages = [
     description: `My first project published on the website was an old bingo project, from a debate earlier this year.
       It has been expanded on slightly, allowing for some level of user generated content and with more bingo sets to play with.`
   }
-]
+];
 
 const Body = props => (
   <Wrapper>

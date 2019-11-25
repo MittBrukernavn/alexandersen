@@ -7,6 +7,7 @@ const Tile = props => {
   const { text, chosen, bingo } = data; 
   const Wrapper = styled.td`
     ${chosen ? `background-color: ${bingo ? '#0000ff' : '#00ff00'};` : ''}
+    ${bingo ? 'color: #fff;' : '' }
     border: 1px solid black;
     min-width: 3em;
     max-width: 15vw;
