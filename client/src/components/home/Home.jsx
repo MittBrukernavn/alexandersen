@@ -6,7 +6,7 @@ import Body from './Body.jsx';
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
-  background-color: lightgrey;
+  background-color: #dadada;
 `;
 
 const H1 = styled.h1`
