@@ -29,3 +29,7 @@ api/node_modules
 
 # environment
 api/.env
+
+# ssl-keys
+api/key.pem
+api/cert.pem
