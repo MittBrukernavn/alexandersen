@@ -33,6 +33,10 @@ const Bingo = props => {
   const [bingoTypes, setBingoTypes] = useState([]);
   const [rows, setRows] = useState([]);
   const [description, setDescription] = useState('');
+  const [konamiCount, setKonamiCount] = useState(0);
+
+  const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+
 
   useEffect(()=>{
     const internal = async () => {
@@ -45,6 +49,38 @@ const Bingo = props => {
     }
     internal();
   }, [])
+
+  useEffect(() => {
+    // konami code easter egg
+    const keyDownHandler = event => {
+      const { keyCode } = event;
+      if (konamiCount === konami.length) {
+        // already completed
+        return;
+      }
+      if (keyCode === konami[konamiCount]) {
+        const newIndex = konamiCount + 1;
+        if(newIndex < konami.length) {
+          // code not completed
+          setKonamiCount(newIndex);
+        } else {
+          // code completed, set all the bingos
+          const rowsCopy = [...rows]
+          rowsCopy.forEach(row => row.forEach(b=>{
+            b.chosen=true;
+            b.bingo=true;
+          }));
+          setRows(rowsCopy);
+        }
+      } else {
+        setKonamiCount(0);
+      }
+    }
+    window.addEventListener('keydown', keyDownHandler);
+    return () => {
+      window.removeEventListener('keydown', keyDownHandler);
+    }
+  }, [konami, konamiCount, rows])
 
   const chooseBingo = async (e) => {
     const id = parseInt(e.target.value);
