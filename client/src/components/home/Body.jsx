@@ -28,6 +28,11 @@ const A = styled.a`
 
 const pages = [
   {
+    title: 'Snake (WIP)',
+    href: '/snake',
+    description: 'In order to effectively procrastinate for my exams, I wanted to program a simple game, like snake. So I did.'
+  },
+  {
     title: 'Binary christmas tree',
     href: '/christmastree',
     description: `For Online's christmas workshop, someone had the bright idea of making a christmas binary tree (i.e. a christmas tree and a binary tree).
