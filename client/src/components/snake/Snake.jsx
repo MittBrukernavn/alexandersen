@@ -8,43 +8,57 @@ const Wrapper = styled.div`
 const Canvas = styled.canvas`
   height: 500px;
   width: 500px;
+  border: 2px solid black;
 `;
 
 const Snake = props => {
   const canvasRef = useRef(null);
   const [ snake, setSnake ] = useState([[3, 5], [2, 5], [1, 5]]);
-  const [ length, setLength ] = useState(5);
-  const [ direction, setDirection ] = useState([1,0]);
-  const [ prevdirection, setPrevdirection ] = useState([1,0]);
+  const [ length, setLength ] = useState(3);
+  const [ apples, setApples ] = useState(0);
+  const [ applePos, setApplePos ] = useState([10, 10]);
+  const [ direction, setDirection ] = useState([0, 0]);
+  const [ prevdirection, setPrevdirection ] = useState([0,0]);
   const [ gameover, setGameover ] = useState(false);
 
   // draws whenever the snake changes
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
-    ctx.lineWidth = 40;
-    if (gameover) {
-      ctx.strokeStyle='red';
-    }
+    
     ctx.clearRect(0, 0, 1000, 1000);
+    // apple
+    ctx.beginPath();
+    const [ appleX, appleY ] = applePos;
+    ctx.fillStyle = 'red';
+    ctx.fillRect(50 * appleX + 5, 50 * appleY + 5, 40, 40);
+    // snake
+    ctx.lineWidth = 40;
+    
+    if (gameover) {
+      ctx.strokeStyle='orange';
+    } else {
+      ctx.strokeStyle='green';
+    }
     ctx.beginPath();
     let [x, y] = snake[0];
-    ctx.moveTo(50*x, 50*y);
-    ctx.lineTo(50*x, 50*y);
-    for (let i = 0; i < snake.length; i++) {
+    ctx.moveTo(50*x + 25, 50*y + 25);
+    ctx.lineTo(50*x + 25, 50*y + 25);
+    for (let i = 1; i < snake.length; i++) {
       const current = snake[i];
-      let [x, y] = current;
-      ctx.lineTo(50*x, 50*y);
+      [x, y] = current;
+      ctx.lineTo(50*x + 25, 50*y + 25);
     }
     ctx.stroke();
+    
   }, [snake, gameover]);
 
   const moveSnake = () => {
-    if (gameover) {
-      return;
-    }
     const [x1, y1] = snake[0];
     setPrevdirection(direction);
     const [dx, dy] = direction;
+    if (gameover || (dx === 0 && dy === 0)) {
+      return;
+    }
     const x2 = x1 + dx;
     const y2 = y1 + dy;
     const nextSnake = [[x2, y2], ...snake];
@@ -52,8 +66,7 @@ const Snake = props => {
       nextSnake.pop();
     }
     // check that snake did not crash
-    if (x2 === 0 || x2 === 20 || y2 === 0 || y2 === 20) {
-      console.log('LOSE');
+    if (x2 < 0 || x2 === 20 || y2 < 0 || y2 === 20) {
       setGameover(true);
       return;
     }
@@ -61,14 +74,38 @@ const Snake = props => {
     for (let i = 1; i < snake.length; i++) {
       const [x, y] = nextSnake[i];
       if(x2 === x && y2 === y) {
-        console.log('LOSE');
         setGameover(true);
         return;
       }
     }
+    const [appleX, appleY] = applePos;
+    if (x2 === appleX && y2 === appleY) {
+      setLength(length + 2);
+      setApples(apples + 1);
+      // generate all eligible points:
+      const eligPoints = [];
+      for(let i = 0; i < 20; i++) {
+        for(let j = 0; j < 20; j++) {
+          let found = false;
+          for (let point of snake) {
+            const [x, y] = point;
+            if (x === i && y === j) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            eligPoints.push([i,j]);
+          }
+        }
+      }
+      const pt = eligPoints[Math.floor(Math.random() * eligPoints.length)];
+      setApplePos(pt);
+    }
     setSnake(nextSnake);
   }
 
+  // game ticks
   useEffect(() => {
     const a = setTimeout(moveSnake, 200);
     return () => clearTimeout(a);
@@ -90,9 +127,7 @@ const Snake = props => {
       }
       const [dx, dy] = prevdirection;
       const [dxNew, dyNew] = proposedDirection;
-      if (dx === -dxNew && dy === -dyNew) {
-        console.log('Invalid');
-      } else {
+      if (dx !== -dxNew || dy !== -dyNew) {
         setDirection([dxNew, dyNew]);
       }
     };
@@ -104,6 +139,7 @@ const Snake = props => {
 
   return (
     <Wrapper>
+      <h3>Score: {apples}</h3>
       <Canvas ref={canvasRef} width={1000} height={1000} />
     </Wrapper>
   );
