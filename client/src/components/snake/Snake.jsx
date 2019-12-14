@@ -51,6 +51,7 @@ const Snake = props => {
       [x, y] = snake[i];
       ctx.lineTo(tileSize * (x + 0.5), tileSize * (y + 0.5));
     }
+
     ctx.stroke();
     
   }, [snake, applePos, gameover]);
@@ -89,7 +90,7 @@ const Snake = props => {
       for(let i = 0; i < 20; i++) {
         for(let j = 0; j < 20; j++) {
           let found = false;
-          for (let point of snake) {
+          for (let point of nextSnake) {
             const [x, y] = point;
             if (x === i && y === j) {
               found = true;
