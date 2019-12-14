@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-
+  margin: auto;
 `;
 
 const Canvas = styled.canvas`
@@ -18,21 +18,23 @@ const Snake = props => {
   const [ apples, setApples ] = useState(0);
   const [ applePos, setApplePos ] = useState([10, 10]);
   const [ direction, setDirection ] = useState([0, 0]);
-  const [ prevdirection, setPrevdirection ] = useState([0,0]);
   const [ gameover, setGameover ] = useState(false);
 
   // draws whenever the snake changes
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
+    const tileSize = 50;
+    const spacing = 5;
+    const spacedWidth = tileSize - 2 * spacing;
     
     ctx.clearRect(0, 0, 1000, 1000);
     // apple
     ctx.beginPath();
     const [ appleX, appleY ] = applePos;
     ctx.fillStyle = 'red';
-    ctx.fillRect(50 * appleX + 5, 50 * appleY + 5, 40, 40);
+    ctx.fillRect(tileSize * (appleX + 0.5) - 20, tileSize * (appleY + 0.5)  - 20, spacedWidth, spacedWidth);
     // snake
-    ctx.lineWidth = 40;
+    ctx.lineWidth = spacedWidth;
     
     if (gameover) {
       ctx.strokeStyle='orange';
@@ -40,21 +42,21 @@ const Snake = props => {
       ctx.strokeStyle='green';
     }
     ctx.beginPath();
+    const [headx, heady] = snake[0];
+    const [prevx, prevy] = snake[1];
+    const [ dx, dy ] = [headx-prevx, heady-prevy];
     let [x, y] = snake[0];
-    ctx.moveTo(50*x + 25, 50*y + 25);
-    ctx.lineTo(50*x + 25, 50*y + 25);
+    ctx.moveTo(tileSize * (x + 0.5 + 0.5 * dx) - (dx * spacing), tileSize * (y + 0.5 + 0.5 * dy) - (dy * spacing));
     for (let i = 1; i < snake.length; i++) {
-      const current = snake[i];
-      [x, y] = current;
-      ctx.lineTo(50*x + 25, 50*y + 25);
+      [x, y] = snake[i];
+      ctx.lineTo(tileSize * (x + 0.5), tileSize * (y + 0.5));
     }
     ctx.stroke();
     
-  }, [snake, gameover]);
+  }, [snake, applePos, gameover]);
 
   const moveSnake = () => {
     const [x1, y1] = snake[0];
-    setPrevdirection(direction);
     const [dx, dy] = direction;
     if (gameover || (dx === 0 && dy === 0)) {
       return;
@@ -125,7 +127,9 @@ const Snake = props => {
       if (proposedDirection === undefined) {
         return;
       }
-      const [dx, dy] = prevdirection;
+      const [headx, heady] = snake[0];
+      const [prevx, prevy] = snake[1];
+      const [ dx, dy ] = [headx-prevx, heady-prevy];
       const [dxNew, dyNew] = proposedDirection;
       if (dx !== -dxNew || dy !== -dyNew) {
         setDirection([dxNew, dyNew]);
@@ -135,7 +139,7 @@ const Snake = props => {
     return () => {
       window.removeEventListener('keydown', keyDownHandler);
     };
-  }, [prevdirection]);
+  }, [snake]);
 
   return (
     <Wrapper>
