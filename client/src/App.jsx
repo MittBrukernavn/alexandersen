@@ -7,6 +7,7 @@ import Bingo from './components/bingo/Bingo.jsx';
 import BingoRequest from './components/bingo/BingoRequest.jsx';
 import ChristmasTree from './components/christmas-binary-tree/ChristmasTree.jsx';
 import Snake from './components/snake/Snake.jsx';
+import Minesweeper from './components/minesweeper/Minesweeper.jsx';
 
 import Login from './components/admin/Login.jsx';
 import AdminPanel from './components/admin/AdminPanel.jsx';
@@ -22,6 +23,7 @@ function App() {
       <Route path='/bingo' exact component={Bingo} />
       <Route path='/bingo/request' component={BingoRequest} />
       <Route path='/christmastree' exact component={ChristmasTree} />
+      <Route path='/minesweeper' component={Minesweeper} />
       <Route path='/snake' component={Snake} />
       <Route path='/admin' exact component={()=><Redirect to='/admin/login' />} />
       <Route path='/admin/login' component={Login} />

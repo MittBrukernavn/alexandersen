@@ -28,7 +28,12 @@ const A = styled.a`
 
 const pages = [
   {
-    title: 'Snake (WIP)',
+    title: 'Minesweeper',
+    href: '/minesweeper',
+    description: 'Another game I made, this one after my final exam.'
+  },
+  {
+    title: 'Snake',
     href: '/snake',
     description: 'In order to effectively procrastinate for my exams, I wanted to program a simple game, like snake. So I did.'
   },
