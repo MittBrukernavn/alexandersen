@@ -11,7 +11,6 @@ const Wrapper = styled.td`
 
 const MinesweeperTile = props => {
   const { tested, bomb, num, onClick } = props;
-
   return (
     <Wrapper tested={tested} bomb={bomb} onClick={onClick}>
       {tested && !bomb && num > 0 ? num : null }

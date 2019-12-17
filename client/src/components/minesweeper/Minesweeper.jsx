@@ -29,7 +29,14 @@ const Minesweeper = (props) => {
           }
         }
       }
-      // TODO: randomly shuffle
+
+      // randomly shuffle
+      for(let i = possiblePositions.length - 1; i > 0; i--) {
+        const j = Math.floor((i + 1 ) * Math.random());
+        const c = possiblePositions[i];
+        possiblePositions[i] = possiblePositions[j];
+        possiblePositions[j] = c;
+      }
       
       // pick the first positions of the randomized list, and set them to be bombs
       for(let i = 0; i < bombCount; i++) {
@@ -45,7 +52,6 @@ const Minesweeper = (props) => {
           }
         }
       }
-      console.log('Initialized');
     }
     nextBoard[rowNumber][colNumber].checked = true;
     setBoard(nextBoard);
