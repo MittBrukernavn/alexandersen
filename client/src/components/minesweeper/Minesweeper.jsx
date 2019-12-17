@@ -53,7 +53,25 @@ const Minesweeper = (props) => {
         }
       }
     }
-    nextBoard[rowNumber][colNumber].checked = true;
+
+    // TODO: also check "no-brainers" automatically, i.e. keep expanding neighbors if num is 0.
+    const stack = [[rowNumber, colNumber]];
+    while (stack.length) {
+      const [y, x] = stack.pop();
+      if (!nextBoard[y][x].checked) {
+        nextBoard[y][x].checked = true;
+        if (nextBoard[y][x].num === 0) {
+          // push onto the stack
+          for(let ny=y-1; ny <= y+1; ny++) {
+            for(let nx=x-1; nx <= x+1; nx++) {
+              if(ny >= 0 && ny < nextBoard.length && nx >= 0 && nx < nextBoard[ny].length) {
+                stack.push([ny, nx]);
+              }
+            }
+          }
+        } 
+      }
+    }
     setBoard(nextBoard);
   };
   
