@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import Row from './Row.jsx';
+import Row from './Row';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
 
 const H1 = styled.h1`
   text-align: center;
@@ -28,7 +28,7 @@ const Board = styled.table`
   min-height: 75vh;
 `;
 
-const Bingo = props => {
+const Bingo = () => {
   const [index, setIndex] = useState(0);
   const [bingoTypes, setBingoTypes] = useState([]);
   const [rows, setRows] = useState([]);
@@ -37,22 +37,21 @@ const Bingo = props => {
 
   const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const internal = async () => {
       const U = new URL(window.location.href);
-      U.port=5000;
-      U.pathname='/api/bingo/';
+      U.port = 5000;
+      U.pathname = '/api/bingo/';
       const res = await fetch(U.href);
       const { bingos } = await res.json();
       setBingoTypes(bingos);
-    }
+    };
     internal();
-  }, [])
+  }, []);
 
   useEffect(() => {
     // konami code easter egg
-    const keyDownHandler = event => {
+    const keyDownHandler = (event) => {
       const { keyCode } = event;
       if (konamiCount === konami.length) {
         // already completed
@@ -60,56 +59,62 @@ const Bingo = props => {
       }
       if (keyCode === konami[konamiCount]) {
         const newIndex = konamiCount + 1;
-        if(newIndex < konami.length) {
+        if (newIndex < konami.length) {
           // code not completed
           setKonamiCount(newIndex);
         } else {
           // code completed, set all the bingos
-          const rowsCopy = [...rows]
-          rowsCopy.forEach(row => row.forEach(b=>{
-            b.chosen=true;
-            b.bingo=true;
-          }));
+          const rowsCopy = rows.map((cols) => (
+            cols.map(((obj) => ({ ...obj, chosen: true, bingo: true })))
+          ));
           setRows(rowsCopy);
         }
       } else {
         setKonamiCount(0);
       }
-    }
+    };
     window.addEventListener('keydown', keyDownHandler);
     return () => {
       window.removeEventListener('keydown', keyDownHandler);
-    }
-  }, [konami, konamiCount, rows])
+    };
+  }, [konami, konamiCount, rows]);
 
   const chooseBingo = async (e) => {
-    const id = parseInt(e.target.value);
+    const id = parseInt(e.target.value, 10);
     setIndex(id);
     const U = new URL(window.location.href);
-    U.port=5000;
-    U.pathname=`/api/bingo/${id}`;
+    U.port = 5000;
+    U.pathname = `/api/bingo/${id}`;
     const res = await fetch(U.href);
-    const { rows, description } = await res.json();
-    setRows(rows);
-    setDescription(description);
-  }
+    const {
+      rows: receivedRows,
+      description: receivedDescription,
+    } = await res.json();
+    setRows(receivedRows);
+    setDescription(receivedDescription);
+  };
 
-  const checkForBingo = (rows) => {
-    for(let i = 0; i < rows.length; i++) {
-      const rowBingo = rows[i].reduce((current,next)=>current&&next.chosen, true);
-      rows[i].forEach(b=>b.bingo=rowBingo);
+  const checkForBingo = (rowsParam) => {
+    const r = rowsParam.map((cols) => (
+      cols.map((obj) => ({ ...obj }))
+    ));
+    for (let i = 0; i < r.length; i++) {
+      const rowBingo = r[i].reduce((current, next) => current && next.chosen, true);
+      for (let j = 0; j < r[i].length; j++) {
+        r[i][j].bingo = rowBingo;
+      }
     }
-    for(let j = 0; j < rows[0].length; j++) {
-      let colBingo=true;
-      for(let i = 0; i < rows.length; i++) {
-        if (!rows[i][j].chosen) {
-          colBingo=false;
+    for (let j = 0; j < r[0].length; j++) {
+      let colBingo = true;
+      for (let i = 0; i < r.length; i++) {
+        if (!r[i][j].chosen) {
+          colBingo = false;
           break;
         }
       }
-      if(colBingo) {
-        for(let i = 0; i < rows.length; i++) {
-          rows[i][j].bingo=true;
+      if (colBingo) {
+        for (let i = 0; i < r.length; i++) {
+          r[i][j].bingo = true;
         }
       }
     }
@@ -117,48 +122,56 @@ const Bingo = props => {
     // diagonal 1
     let diag1 = true;
     let diag2 = true;
-    for(let i = 0; i < rows.length; i++) {
-      if(!rows[i][i].chosen) {
+    for (let i = 0; i < r.length; i++) {
+      if (!r[i][i].chosen) {
         diag1 = false;
       }
-      const j = rows[i].length - 1 - i;
-      if(!rows[i][j].chosen) {
+      const j = r[i].length - 1 - i;
+      if (!r[i][j].chosen) {
         diag2 = false;
       }
     }
     if (diag1) {
-      for (let i = 0; i < rows.length; i++) {
-        rows[i][i].bingo=true;
+      for (let i = 0; i < r.length; i++) {
+        r[i][i].bingo = true;
       }
     }
     if (diag2) {
-      for (let i = 0; i < rows.length; i++) {
-        const j = rows[i].length - 1 - i;
-        rows[i][j].bingo=true;
+      for (let i = 0; i < r.length; i++) {
+        const j = r[i].length - 1 - i;
+        r[i][j].bingo = true;
       }
     }
-  }
+    return r;
+  };
 
   const toggleChosen = (row, col) => {
-    const rows_copy = [...rows];
-    rows_copy[row][col].chosen = !rows[row][col].chosen;
-    checkForBingo(rows_copy);
-    setRows(rows_copy);
-  }
+    const rowsCopy = [...rows];
+    rowsCopy[row][col].chosen = !rows[row][col].chosen;
+    setRows(checkForBingo(rowsCopy));
+  };
 
   return (
     <Wrapper>
-      <H1><select value={index} onChange={chooseBingo}>
+      <H1>
+        <select value={index} onChange={chooseBingo}>
           {index === 0 ? <option value={0}>Velg en</option> : null}
-          {bingoTypes.map(({id, name}) => <option key={id} value={id}>{name}</option>)}
-        </select>-bingo</H1>
-        <p>{description}</p>
+          {bingoTypes.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+        </select>
+        -bingo
+      </H1>
+      <p>{description}</p>
       <Board>
         <tbody>
-          {rows.map((row, index) => <Row key={index} data={row} rowIndex={index} toggle={toggleChosen} /> )}
+          {rows.map((row, rowNumber) => (
+            // eslint-disable-next-line
+            <Row key={rowNumber} data={row} rowIndex={index} toggle={toggleChosen} />
+          ))}
         </tbody>
       </Board>
-      <p>Har du lyst til å legge til flere felt til bingoen, kan du gjøre det <a href='/bingo/request'>her</a>
+      <p>
+        Har du lyst til å legge til flere felt til bingoen, kan du gjøre det
+        <a href="/bingo/request">her</a>
       </p>
     </Wrapper>
   );

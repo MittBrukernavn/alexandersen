@@ -7,64 +7,64 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const ReviewRequests = props => {
+const ReviewRequests = () => {
   const [requests, setRequests] = useState([]);
 
   const getReq = () => ({
     method: 'POST',
     body: JSON.stringify({
-      token: localStorage.getItem('token')
+      token: localStorage.getItem('token'),
     }),
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' },
   });
 
-  useEffect(()=> {
+  useEffect(() => {
     const internal = async () => {
       const req = getReq();
       const U = new URL(window.location.href);
-      U.port=5000;
-      U.pathname='/api/bingo/reviewRequests'
+      U.port = 5000;
+      U.pathname = '/api/bingo/reviewRequests';
       const res = await fetch(U.href, req);
       const j = await res.json();
-      const {error, requests} = j;
+      const { error, requests: receivedRequests } = j;
       if (error) {
         console.log('Something went wrong');
         console.log(error);
       } else {
-        setRequests(requests);
+        setRequests(receivedRequests);
       }
-    }
+    };
     internal();
   }, []);
 
   const accept = async (id) => {
     const req = getReq();
     const U = new URL(window.location.href);
-    U.port=5000;
-    U.pathname=`/api/bingo/approveRequest/${id}`;
-    const res = await fetch(U.href,req);
+    U.port = 5000;
+    U.pathname = `/api/bingo/approveRequest/${id}`;
+    const res = await fetch(U.href, req);
     const j = await res.json();
     if (j.error) {
       console.log('Something went wrong');
     } else {
-      setRequests(requests.filter(req=>req.id!==id));
+      setRequests(requests.filter((r) => r.id !== id));
     }
-  }
+  };
 
   const reject = async (id) => {
     const req = getReq();
     const U = new URL(window.location.href);
-    U.port=5000;
-    U.pathname=`/api/bingo/deleteRequest/${id}`;
+    U.port = 5000;
+    U.pathname = `/api/bingo/deleteRequest/${id}`;
     const res = await fetch(U.href, req);
     const j = await res.json();
     if (j.error) {
-      console.log('Something went wrong:')
+      console.log('Something went wrong:');
       console.log(j.error);
     } else {
-      setRequests(requests.filter(req=>req.id!==id));
+      setRequests(requests.filter((r) => r.id !== id));
     }
-  }
+  };
 
   return (
     <Wrapper>
@@ -78,14 +78,14 @@ const ReviewRequests = props => {
           </tr>
         </thead>
         <tbody>
-          {requests.map(req => {
-            const {bingoName, id, promptText} = req;
+          {requests.map((req) => {
+            const { bingoName, id, promptText } = req;
             return (
               <tr key={id}>
                 <td>{bingoName}</td>
                 <td>{promptText}</td>
-                <td><button type="button" onClick={()=>accept(id)}>Accept</button></td>
-                <td><button type="button" onClick={()=>reject(id)}>Reject</button></td>
+                <td><button type="button" onClick={() => accept(id)}>Accept</button></td>
+                <td><button type="button" onClick={() => reject(id)}>Reject</button></td>
               </tr>
             );
           })}

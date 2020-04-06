@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "lint": "eslint --ignore-path .eslintignore --ext js,jsx ."
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -16,5 +17,10 @@
     "morgan": "~1.9.1",
     "mysql2": "^2.0.0",
     "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2"
   }
 }

@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const NewBingo = props => {
+const NewBingo = () => {
   const [name, setName] = useState('');
   const [freeSpace, setFreeSpace] = useState('');
   const [allPrompts, setAllPrompts] = useState('');
@@ -30,29 +30,32 @@ const NewBingo = props => {
         freeSpace,
         description,
         allPrompts: allPromptsAsList,
-        token
+        token,
       }),
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
-    console.log(req);
     const U = new URL(window.location.href);
-    U.port=5000;
-    U.pathname='/api/bingo/';
+    U.port = 5000;
+    U.pathname = '/api/bingo/';
     const res = await fetch(U.href, req);
-    console.log(res);
-  }
+    const { ok } = res;
+    // redirect on success
+    if (ok) {
+      window.location.href = '/admin';
+    }
+  };
 
   return (
     <Wrapper>
-      <input type="text" value={name} placeholder="Name" onChange={e=>setName(e.target.value)} />
-      <input type="text" value={freeSpace} placeholder="Free Space" onChange={e=>setFreeSpace(e.target.value)} />
-      <textarea value={description} placeholder="Description" onChange={e=>setDescription(e.target.value)} />
-      <textarea value={allPrompts} placeholder="Prompts (one per line)" onChange={e=>setAllPrompts(e.target.value)} />
+      <input type="text" value={name} placeholder="Name" onChange={(e) => setName(e.target.value)} />
+      <input type="text" value={freeSpace} placeholder="Free Space" onChange={(e) => setFreeSpace(e.target.value)} />
+      <textarea value={description} placeholder="Description" onChange={(e) => setDescription(e.target.value)} />
+      <textarea value={allPrompts} placeholder="Prompts (one per line)" onChange={(e) => setAllPrompts(e.target.value)} />
       <button type="button" onClick={submit}>Submit</button>
     </Wrapper>
   );
-}
+};
 
 export default NewBingo;

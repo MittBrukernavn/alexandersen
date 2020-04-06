@@ -1,14 +1,31 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import Tile from './Tile.jsx';
+import Tile from './Tile';
 
-const Row = props => {
-  const { data, rowIndex, toggle } = props;
-  return (
-    <tr>
-      {data.map((tile, columnIndex) => <Tile key={columnIndex} data={tile} rowIndex={rowIndex} columnIndex={columnIndex} toggle={toggle} />)}
-    </tr>
-  );
-}
+const Row = ({ data, rowIndex, toggle }) => (
+  <tr>
+    {data.map((tile, columnIndex) => (
+      <Tile
+        // eslint-disable-next-line
+        key={columnIndex}
+        data={tile}
+        rowIndex={rowIndex}
+        columnIndex={columnIndex}
+        toggle={toggle}
+      />
+    ))}
+  </tr>
+);
+
+Row.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({
+    text: PropTypes.string.isRequired,
+    chosen: PropTypes.boolean.isRequired,
+    bingo: PropTypes.bool.isRequired,
+  })).isRequired,
+  rowIndex: PropTypes.number.isRequired,
+  toggle: PropTypes.func.isRequired,
+};
 
 export default Row;

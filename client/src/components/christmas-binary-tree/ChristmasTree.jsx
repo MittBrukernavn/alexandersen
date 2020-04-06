@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import Tree from './Tree.jsx';
+import Tree from './Tree';
 
 const Wrapper = styled.div`
   max-width: 80vw;
@@ -24,13 +24,15 @@ const ChristmasTree = () => {
   return (
     <Wrapper>
       <InputField>
-        <label htmlFor='nodeCountIn' >
-          How many nodes? <input id='nodeCountIn' value={nodeCount} onChange={e=>setNodeCount(e.target.value)} />
+        <label htmlFor="nodeCountIn">
+          How many nodes?
+          {' '}
+          <input id="nodeCountIn" value={nodeCount} onChange={(e) => setNodeCount(e.target.value)} />
         </label>
       </InputField>
       {nodeCount > 0 ? <Tree depth={1} nodeCount={nodeCount} /> : null}
     </Wrapper>
   );
-}
+};
 
 export default ChristmasTree;

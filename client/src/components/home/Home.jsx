@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Body from './Body.jsx';
+import Body from './Body';
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -26,10 +26,10 @@ const A = styled.a`
   text-decoration: none;
 `;
 
-const Home = props => (
+const Home = () => (
   <Wrapper>
     <H1>Welcome to my humble site</H1>
-    <CVPlug><A href='/cv.pdf' target='_blank'>(Wait, who is this?)</A></CVPlug>
+    <CVPlug><A href="/cv.pdf" target="_blank">(Wait, who is this?)</A></CVPlug>
     <Body />
   </Wrapper>
 );

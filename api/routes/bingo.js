@@ -1,77 +1,82 @@
 const express = require('express');
+
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2/promise');
 
 const connect = () => {
-  const { DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS } = process.env;
+  const {
+    DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS,
+  } = process.env;
   return mysql.createConnection({
     host: DB_HOST,
     user: DB_USER,
     password: DB_PASS,
-    database: BINGO_DB_NAME
+    database: BINGO_DB_NAME,
   });
-}
+};
 
 const connectPool = () => {
-  const { DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS } = process.env;
+  const {
+    DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS,
+  } = process.env;
   return mysql.createPool({
     host: DB_HOST,
     user: DB_USER,
     password: DB_PASS,
-    database: BINGO_DB_NAME
+    database: BINGO_DB_NAME,
   });
-}
+};
 
 
-router.get('/', async (_, res) => {
+router.get('/', async (_req, res) => {
   const connection = await connect();
   const response = await connection.query('SELECT ID as id, Name as name from Bingos');
-  res.json({bingos: response[0]});
+  res.json({ bingos: response[0] });
   connection.end();
 });
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   const pool = await connectPool();
-  
-  const [ bingoRes, promptsRes ] = await Promise.all([
+
+  const [bingoRes, promptsRes] = await Promise.all([
     pool.query('SELECT Description as description, FreeSpace as freeSpace FROM Bingos WHERE ID=?', [id]),
-    pool.query('SELECT PromptText as text FROM Prompts WHERE BingoID=? ORDER BY RAND() LIMIT 25', [id])
+    pool.query('SELECT PromptText as text FROM Prompts WHERE BingoID=? ORDER BY RAND() LIMIT 25', [id]),
   ]);
   pool.end();
   if (bingoRes[0].length === 0) {
-    res.status(404).json({error:'No such bingo'});
+    res.status(404).json({ error: 'No such bingo' });
     return;
   }
   const { freeSpace, description } = bingoRes[0][0];
   const allPrompts = promptsRes[0];
   let n = 5;
-  if(allPrompts.length < 25) {
+  if (allPrompts.length < 25) {
     n = Math.floor(Math.sqrt(allPrompts.length));
   }
   const rows = [];
-  for(let i = 0; i < n*n; i+=n) {
+  for (let i = 0; i < n * n; i += n) {
     const row = [];
-    for(let j = 0; j < n; j++) {
+    for (let j = 0; j < n; j++) {
       row.push({
         text: allPrompts[i + j].text,
         chosen: false,
-        bingo: false
+        bingo: false,
       });
     }
     rows.push(row);
   }
-  if(freeSpace) {
-    rows[Math.floor(n/2)][Math.floor(n/2)] = {
+  if (freeSpace) {
+    rows[Math.floor(n / 2)][Math.floor(n / 2)] = {
       text: `${freeSpace} (free space)`,
       chosen: true,
-      bingo: false
+      bingo: false,
     };
   }
   res.json({
     description,
-    rows
+    rows,
   });
 });
 
@@ -80,19 +85,19 @@ router.post('/request/:id', async (req, res) => {
   const { prompt } = req.body;
   try {
     const connection = await connect();
-    const response = await connection.query('INSERT INTO Request(BingoID, PromptText) VALUES (?,?)', [id,prompt]);
+    const response = await connection.query('INSERT INTO Request(BingoID, PromptText) VALUES (?,?)', [id, prompt]);
     const { insertId } = response[0];
     connection.end();
     if (insertId) {
-      res.json({status: 'ok'});
+      res.json({ status: 'ok' });
     } else {
       res.status(500).json({
-        status: 'Failed'
+        status: 'Failed',
       });
     }
   } catch (error) {
     res.status(500).json({
-      status: 'Failed'
+      status: 'Failed',
     });
   }
 });
@@ -102,22 +107,24 @@ router.post('/request/:id', async (req, res) => {
 /* add a new bingo board, with a name, optional free space, description, and list of prompts
    token is a jsonwebtoken, which should validate that the logged inn person is admin */
 router.post('/', async (req, res) => {
-  const { name, freeSpace, description, allPrompts, token } = req.body;
+  const {
+    name, freeSpace, description, allPrompts, token,
+  } = req.body;
   try {
     const { JWT_KEY } = process.env;
-    jwt.verify(token, JWT_KEY)
+    jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   const connection = await connectPool();
-  const insertRes = await connection.query('INSERT INTO Bingos(Name, FreeSpace, Description) VALUES (?,?,?)', [name,freeSpace,description]);
+  const insertRes = await connection.query('INSERT INTO Bingos(Name, FreeSpace, Description) VALUES (?,?,?)', [name, freeSpace, description]);
   const id = insertRes[0].insertId;
-  const newEntries = allPrompts.map(_=>`(${id}, ?)`);
+  const newEntries = allPrompts.map((_) => `(${id}, ?)`);
   const entryString = newEntries.join(',');
   await connection.query(`INSERT INTO Prompts(BingoID, PromptText) VALUES ${entryString}`, allPrompts);
   connection.end();
-  res.status(200).json({status:'ok'});
+  res.status(200).json({ status: 'ok' });
 });
 
 router.post('/allPrompts/:id', async (req, res) => {
@@ -132,12 +139,13 @@ router.post('/allPrompts/:id', async (req, res) => {
   }
   try {
     const connection = await connect();
-    const [allPrompts, _] = await connection.query('SELECT ID as id, PromptText AS text FROM Prompts WHERE BingoID=?', [id]);
+    // no need for rows
+    const [allPrompts] = await connection.query('SELECT ID as id, PromptText AS text FROM Prompts WHERE BingoID=?', [id]);
     connection.end();
     res.json({
-      allPrompts
+      allPrompts,
     });
-  } catch(_) {
+  } catch (_) {
     res.sendStatus(500);
   }
 });
@@ -149,7 +157,7 @@ router.post('/newPrompt/:id', async (req, res) => {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
@@ -160,10 +168,10 @@ router.post('/newPrompt/:id', async (req, res) => {
 
     res.json({
       status: 'ok',
-      newId: response[0].insertId
+      newId: response[0].insertId,
     });
   } catch (error) {
-    res.status(500).json({error:'Internal Server Error'});
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -174,13 +182,13 @@ router.post('/deletePrompt/:id', async (req, res) => {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   const connection = await connect();
-  connection.query('DELETE FROM Prompts WHERE ID=?', [id])
+  connection.query('DELETE FROM Prompts WHERE ID=?', [id]);
   connection.end();
-  res.json({status:'ok'});
+  res.json({ status: 'ok' });
 });
 
 router.post('/reviewRequests', async (req, res) => {
@@ -189,17 +197,17 @@ router.post('/reviewRequests', async (req, res) => {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
   try {
     const connection = await connect();
-    const [response, _] = await connection.query('SELECT Bingos.Name AS bingoName, Request.ID AS id, Request.PromptText AS promptText FROM Bingos INNER JOIN Request ON Bingos.ID=Request.BingoID');
+    const [response] = await connection.query('SELECT Bingos.Name AS bingoName, Request.ID AS id, Request.PromptText AS promptText FROM Bingos INNER JOIN Request ON Bingos.ID=Request.BingoID');
     connection.end();
-    res.json({status: 'ok', requests: response});
+    res.json({ status: 'ok', requests: response });
   } catch (error) {
-    res.status(500).json({error: 'Failed'});
+    res.status(500).json({ error: 'Failed' });
     console.log(error);
   }
 });
@@ -211,21 +219,21 @@ router.post('/approveRequest/:id', async (req, res) => {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
   }
 
   try {
     const connection = await connect();
-    const [prompt,_] = await connection.query('SELECT PromptText, BingoID FROM Request WHERE ID=?', [id]);
+    const [prompt] = await connection.query('SELECT PromptText, BingoID FROM Request WHERE ID=?', [id]);
     const { PromptText, BingoID } = prompt[0];
     await Promise.all([
       connection.query('DELETE FROM Request WHERE ID=?', [id]),
-      connection.query('INSERT INTO Prompts (BingoID, PromptText) VALUES (?, ?)', [BingoID, PromptText])
+      connection.query('INSERT INTO Prompts (BingoID, PromptText) VALUES (?, ?)', [BingoID, PromptText]),
     ]);
     connection.end();
-    res.json({status:'ok'});
+    res.json({ status: 'ok' });
   } catch (error) {
-    res.status(500).json({error:'Failed'});
+    res.status(500).json({ error: 'Failed' });
     console.log(error);
   }
 });
@@ -238,13 +246,13 @@ router.post('/deleteRequest/:id', async (req, res) => {
     const { JWT_KEY } = process.env;
     jwt.verify(token, JWT_KEY);
   } catch (error) {
-    res.status(401).json({error:'Unauthorized'});
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
   const connection = await connect();
-  connection.query('DELETE FROM Request WHERE ID=?', [id])
+  connection.query('DELETE FROM Request WHERE ID=?', [id]);
   connection.end();
-  res.json({status:'ok'});
+  res.json({ status: 'ok' });
 });
 
 
