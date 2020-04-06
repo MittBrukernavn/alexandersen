@@ -18,10 +18,7 @@ const BingoRequest = () => {
 
   useEffect(() => {
     const internal = async () => {
-      const U = new URL(window.location.href);
-      U.port = 5000;
-      U.pathname = '/api/bingo/';
-      const res = await fetch(U.href);
+      const res = await fetch('/api/bingo/');
       const { bingos: receivedBingos } = await res.json();
       setBingos(receivedBingos);
     };
@@ -36,10 +33,7 @@ const BingoRequest = () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     };
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/request/${id}`;
-    const r = await fetch(U.href, req);
+    const r = await fetch(`/api/bingo/request/${id}`, req);
     const j = await r.json();
     if (j.status === 'ok') {
       setPrompt('');

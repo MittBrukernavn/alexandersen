@@ -23,10 +23,7 @@ const Prompts = () => {
 
   useEffect(() => {
     const internal = async () => {
-      const U = new URL(window.location.href);
-      U.port = 5000;
-      U.pathname = '/api/bingo/';
-      const res = await fetch(U.href);
+      const res = await fetch('/api/bingo/');
       const j = await res.json();
       setBingos(j.bingos);
     };
@@ -37,31 +34,25 @@ const Prompts = () => {
   const changeBingo = async (e) => {
     const newId = e.target.value;
     setId(newId);
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/allPrompts/${newId}`;
     const token = localStorage.getItem('token');
     const req = {
       method: 'POST',
       body: JSON.stringify({ token }),
       headers: { 'Content-Type': 'application/json' },
     };
-    const res = await fetch(U.href, req);
+    const res = await fetch(`/api/bingo/allPrompts/${newId}`, req);
     const j = await res.json();
     setPrompts(j.allPrompts);
   };
 
   const deletePrompt = async (promptId) => {
     const token = localStorage.getItem('token');
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/deletePrompt/${promptId}`;
     const req = {
       method: 'POST',
       body: JSON.stringify({ token }),
       headers: { 'Content-Type': 'application/json' },
     };
-    const res = await fetch(U.href, req);
+    const res = await fetch(`/api/bingo/deletePrompt/${promptId}`, req);
     const { error } = await res.json();
     if (error) {
       console.log(error);
@@ -78,10 +69,7 @@ const Prompts = () => {
       body: JSON.stringify({ token, text }),
       headers: { 'Content-Type': 'application/json' },
     };
-    const U = new URL(window.location.href);
-    U.pathname = `/api/bingo/newPrompt/${id}`;
-    U.port = 5000;
-    const res = await fetch(U.href, req);
+    const res = await fetch(`/api/bingo/newPrompt/${id}`, req);
     const { error, newId } = await res.json();
     if (error) {
       console.log(error);

@@ -21,7 +21,7 @@ const Row = ({ data, rowIndex, toggle }) => (
 Row.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({
     text: PropTypes.string.isRequired,
-    chosen: PropTypes.boolean.isRequired,
+    chosen: PropTypes.bool.isRequired,
     bingo: PropTypes.bool.isRequired,
   })).isRequired,
   rowIndex: PropTypes.number.isRequired,

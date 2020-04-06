@@ -36,10 +36,7 @@ const NewBingo = () => {
         'Content-Type': 'application/json',
       },
     };
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = '/api/bingo/';
-    const res = await fetch(U.href, req);
+    const res = await fetch('/api/bingo/', req);
     const { ok } = res;
     // redirect on success
     if (ok) {

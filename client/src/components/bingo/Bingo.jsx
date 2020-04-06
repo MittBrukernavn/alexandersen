@@ -39,10 +39,7 @@ const Bingo = () => {
 
   useEffect(() => {
     const internal = async () => {
-      const U = new URL(window.location.href);
-      U.port = 5000;
-      U.pathname = '/api/bingo/';
-      const res = await fetch(U.href);
+      const res = await fetch('/api/bingo/');
       const { bingos } = await res.json();
       setBingoTypes(bingos);
     };
@@ -82,10 +79,7 @@ const Bingo = () => {
   const chooseBingo = async (e) => {
     const id = parseInt(e.target.value, 10);
     setIndex(id);
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/${id}`;
-    const res = await fetch(U.href);
+    const res = await fetch(`/api/bingo/${id}`);
     const {
       rows: receivedRows,
       description: receivedDescription,

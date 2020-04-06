@@ -34,11 +34,7 @@ const Login = () => {
         'Content-Type': 'application/json',
       },
     };
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = '/api/users/login';
-
-    const res = await fetch(U.href, req);
+    const res = await fetch('/api/users/login', req);
     const { token, error: err } = await res.json();
     localStorage.setItem('token', token);
     if (err) {

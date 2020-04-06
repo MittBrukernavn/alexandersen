@@ -21,10 +21,7 @@ const ReviewRequests = () => {
   useEffect(() => {
     const internal = async () => {
       const req = getReq();
-      const U = new URL(window.location.href);
-      U.port = 5000;
-      U.pathname = '/api/bingo/reviewRequests';
-      const res = await fetch(U.href, req);
+      const res = await fetch('/api/bingo/reviewRequests', req);
       const j = await res.json();
       const { error, requests: receivedRequests } = j;
       if (error) {
@@ -39,10 +36,7 @@ const ReviewRequests = () => {
 
   const accept = async (id) => {
     const req = getReq();
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/approveRequest/${id}`;
-    const res = await fetch(U.href, req);
+    const res = await fetch(`/api/bingo/approveRequest/${id}`, req);
     const j = await res.json();
     if (j.error) {
       console.log('Something went wrong');
@@ -53,10 +47,7 @@ const ReviewRequests = () => {
 
   const reject = async (id) => {
     const req = getReq();
-    const U = new URL(window.location.href);
-    U.port = 5000;
-    U.pathname = `/api/bingo/deleteRequest/${id}`;
-    const res = await fetch(U.href, req);
+    const res = await fetch(`/api/bingo/deleteRequest/${id}`, req);
     const j = await res.json();
     if (j.error) {
       console.log('Something went wrong:');
