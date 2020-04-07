@@ -29,7 +29,7 @@ const Board = styled.table`
 `;
 
 const Bingo = () => {
-  const [index, setIndex] = useState(0);
+  const [bingoId, setBingoId] = useState(0);
   const [bingoTypes, setBingoTypes] = useState([]);
   const [rows, setRows] = useState([]);
   const [description, setDescription] = useState('');
@@ -78,7 +78,7 @@ const Bingo = () => {
 
   const chooseBingo = async (e) => {
     const id = parseInt(e.target.value, 10);
-    setIndex(id);
+    setBingoId(id);
     const res = await fetch(`/api/bingo/${id}`);
     const {
       rows: receivedRows,
@@ -148,8 +148,8 @@ const Bingo = () => {
   return (
     <Wrapper>
       <H1>
-        <select value={index} onChange={chooseBingo}>
-          {index === 0 ? <option value={0}>Velg en</option> : null}
+        <select value={bingoId} onChange={chooseBingo}>
+          {bingoId === 0 ? <option value={0}>Velg en</option> : null}
           {bingoTypes.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
         </select>
         -bingo
@@ -159,7 +159,7 @@ const Bingo = () => {
         <tbody>
           {rows.map((row, rowNumber) => (
             // eslint-disable-next-line
-            <Row key={rowNumber} data={row} rowIndex={index} toggle={toggleChosen} />
+            <Row key={rowNumber} data={row} rowIndex={rowNumber} toggle={toggleChosen} />
           ))}
         </tbody>
       </Board>
