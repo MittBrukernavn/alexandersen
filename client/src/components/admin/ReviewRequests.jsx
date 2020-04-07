@@ -12,10 +12,10 @@ const ReviewRequests = () => {
 
   const getReq = () => ({
     method: 'POST',
-    body: JSON.stringify({
-      token: localStorage.getItem('token'),
-    }),
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
   });
 
   useEffect(() => {

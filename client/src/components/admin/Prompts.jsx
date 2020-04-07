@@ -37,8 +37,10 @@ const Prompts = () => {
     const token = localStorage.getItem('token');
     const req = {
       method: 'POST',
-      body: JSON.stringify({ token }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     };
     const res = await fetch(`/api/bingo/allPrompts/${newId}`, req);
     const j = await res.json();
@@ -49,8 +51,10 @@ const Prompts = () => {
     const token = localStorage.getItem('token');
     const req = {
       method: 'POST',
-      body: JSON.stringify({ token }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     };
     const res = await fetch(`/api/bingo/deletePrompt/${promptId}`, req);
     const { error } = await res.json();
@@ -66,8 +70,11 @@ const Prompts = () => {
     const text = newPrompt;
     const req = {
       method: 'POST',
-      body: JSON.stringify({ token, text }),
-      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     };
     const res = await fetch(`/api/bingo/newPrompt/${id}`, req);
     const { error, newId } = await res.json();
