@@ -2,32 +2,10 @@ const express = require('express');
 
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const mysql = require('mysql2/promise');
 
-const connect = () => {
-  const {
-    DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS,
-  } = process.env;
-  return mysql.createConnection({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASS,
-    database: BINGO_DB_NAME,
-  });
-};
+const { connect, connectPool } = require('../db/connections');
 
-const connectPool = () => {
-  const {
-    DB_HOST, BINGO_DB_NAME, DB_USER, DB_PASS,
-  } = process.env;
-  return mysql.createPool({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASS,
-    database: BINGO_DB_NAME,
-  });
-};
-
+const { adminOnly } = require('../middlewares/index');
 
 router.get('/', async (_req, res) => {
   const connection = await connect();
@@ -104,39 +82,31 @@ router.post('/request/:id', async (req, res) => {
 
 /* here and down is admin functionality */
 
+router.use(adminOnly);
+
 /* add a new bingo board, with a name, optional free space, description, and list of prompts
    token is a jsonwebtoken, which should validate that the logged inn person is admin */
+
 router.post('/', async (req, res) => {
   const {
-    name, freeSpace, description, allPrompts, token,
+    name, freeSpace, description, allPrompts,
   } = req.body;
   try {
-    const { JWT_KEY } = process.env;
-    jwt.verify(token, JWT_KEY);
-  } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
+    const connection = await connectPool();
+    const insertRes = await connection.query('INSERT INTO Bingos(Name, FreeSpace, Description) VALUES (?,?,?)', [name, freeSpace, description]);
+    const id = insertRes[0].insertId;
+    const newEntries = allPrompts.map((_) => `(${id}, ?)`);
+    const entryString = newEntries.join(',');
+    await connection.query(`INSERT INTO Prompts(BingoID, PromptText) VALUES ${entryString}`, allPrompts);
+    connection.end();
+    res.status(200).json({ status: 'ok' });
+  } catch (err) {
+    res.sendStatus(500);
   }
-  const connection = await connectPool();
-  const insertRes = await connection.query('INSERT INTO Bingos(Name, FreeSpace, Description) VALUES (?,?,?)', [name, freeSpace, description]);
-  const id = insertRes[0].insertId;
-  const newEntries = allPrompts.map((_) => `(${id}, ?)`);
-  const entryString = newEntries.join(',');
-  await connection.query(`INSERT INTO Prompts(BingoID, PromptText) VALUES ${entryString}`, allPrompts);
-  connection.end();
-  res.status(200).json({ status: 'ok' });
 });
 
 router.post('/allPrompts/:id', async (req, res) => {
-  const { token } = req.body;
   const { id } = req.params;
-  try {
-    const { JWT_KEY } = process.env;
-    jwt.verify(token, JWT_KEY);
-  } catch (error) {
-    res.sendStatus(401);
-    return;
-  }
   try {
     const connection = await connect();
     // no need for rows
