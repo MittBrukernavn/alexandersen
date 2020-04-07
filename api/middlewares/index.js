@@ -5,9 +5,9 @@ const { JWT_KEY } = process.env;
 const adminOnly = (req, res, next) => {
   try {
     const { headers } = req;
-    const { Authorization } = headers;
-    if (Authorization && Authorization.startsWith('Bearer ')) {
-      const token = Authorization.substring(7);
+    const { authorization } = headers;
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const token = authorization.substring(7);
       jwt.verify(token, JWT_KEY);
       next();
     } else {
