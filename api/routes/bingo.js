@@ -61,7 +61,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.PUT('/:id/request', async (req, res) => {
+router.put('/:id/request', async (req, res) => {
   const { id } = req.params;
   const { prompt } = req.body;
   try {
