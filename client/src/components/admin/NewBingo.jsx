@@ -24,7 +24,7 @@ const NewBingo = () => {
     const allPromptsAsList = allPrompts.split('\n');
     const token = localStorage.getItem('token');
     const req = {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({
         name,
         freeSpace,

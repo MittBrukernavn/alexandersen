@@ -61,7 +61,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/request/:id', async (req, res) => {
+router.PUT('/:id/request', async (req, res) => {
   const { id } = req.params;
   const { prompt } = req.body;
   try {
@@ -90,7 +90,7 @@ router.use(adminOnly);
 /* add a new bingo board, with a name, optional free space, description, and list of prompts
    token is a jsonwebtoken, which should validate that the logged inn person is admin */
 
-router.post('/', async (req, res) => {
+router.put('/', async (req, res) => {
   const {
     name, freeSpace, description, allPrompts,
   } = req.body;
@@ -108,7 +108,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/allPrompts/:id', async (req, res) => {
+router.get('/:id/prompts', async (req, res) => {
   const { id } = req.params;
   try {
     const connection = await connect();
@@ -123,7 +123,7 @@ router.post('/allPrompts/:id', async (req, res) => {
   }
 });
 
-router.post('/newPrompt/:id', async (req, res) => {
+router.put('/:id/prompts', async (req, res) => {
   const { id } = req.params;
   const { text, token } = req.body;
   try {
@@ -148,7 +148,7 @@ router.post('/newPrompt/:id', async (req, res) => {
   }
 });
 
-router.post('/deletePrompt/:id', async (req, res) => {
+router.delete('/prompts/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const connection = await connect();

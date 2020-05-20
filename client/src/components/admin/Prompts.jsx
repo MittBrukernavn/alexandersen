@@ -36,13 +36,13 @@ const Prompts = () => {
     setId(newId);
     const token = localStorage.getItem('token');
     const req = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     };
-    const res = await fetch(`/api/bingo/allPrompts/${newId}`, req);
+    const res = await fetch(`/api/bingo/${newId}/prompts`, req);
     const j = await res.json();
     setPrompts(j.allPrompts);
   };
@@ -50,13 +50,13 @@ const Prompts = () => {
   const deletePrompt = async (promptId) => {
     const token = localStorage.getItem('token');
     const req = {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     };
-    const res = await fetch(`/api/bingo/deletePrompt/${promptId}`, req);
+    const res = await fetch(`/api/bingo/prompts/${promptId}`, req);
     const { error } = await res.json();
     if (error) {
       console.log(error);
@@ -69,14 +69,14 @@ const Prompts = () => {
     const token = localStorage.getItem('token');
     const text = newPrompt;
     const req = {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({ text }),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     };
-    const res = await fetch(`/api/bingo/newPrompt/${id}`, req);
+    const res = await fetch(`/api/bingo/${id}/prompts`, req);
     const { error, newId } = await res.json();
     if (error) {
       console.log(error);

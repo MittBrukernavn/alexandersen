@@ -27,13 +27,13 @@ const BingoRequest = () => {
 
   const submit = async () => {
     const req = {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({
         prompt,
       }),
       headers: { 'Content-Type': 'application/json' },
     };
-    const r = await fetch(`/api/bingo/request/${id}`, req);
+    const r = await fetch(`/api/bingo/${id}/request`, req);
     const j = await r.json();
     if (j.status === 'ok') {
       setPrompt('');
