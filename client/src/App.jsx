@@ -8,6 +8,7 @@ import BingoRequest from './components/bingo/BingoRequest';
 import ChristmasTree from './components/christmas-binary-tree/ChristmasTree';
 import Snake from './components/snake/Snake';
 import Minesweeper from './components/minesweeper/Minesweeper';
+import NeuralNets from './components/neural-nets/NeuralNets';
 
 import Login from './components/admin/Login';
 import AdminPanel from './components/admin/AdminPanel';
@@ -15,11 +16,11 @@ import NewBingo from './components/admin/NewBingo';
 import Prompts from './components/admin/Prompts';
 import ReviewRequests from './components/admin/ReviewRequests';
 
-
 function App() {
   return (
     <Router>
       <Route path="/" exact component={Home} />
+      <Route path="/nn" component={NeuralNets} />
       <Route path="/bingo" exact component={Bingo} />
       <Route path="/bingo/request" component={BingoRequest} />
       <Route path="/christmastree" exact component={ChristmasTree} />
