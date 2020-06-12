@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import * as tf from '@tensorflow/tfjs';
 
-import DrawingCanvas from './DrawingCanvas'
+import zeros from '../../utils/zeros';
+import DrawingCanvas from './DrawingCanvas';
 
 const Wrapper = styled.div`
   margin: 0 0.5em;
@@ -10,7 +11,8 @@ const Wrapper = styled.div`
 
 const MNIST = () => {
   const [model, setModel] = useState(null);
-  const [pixels, setPixels] = useState([]);
+  const [pixels, setPixels] = useState(zeros(784));
+  const [drawn, setDrawn] = useState(false);
   const [digit, setDigit] = useState(-1);
   const [probability, setProbability] = useState(0);
 
@@ -24,7 +26,7 @@ const MNIST = () => {
   }, []);
 
   useEffect(() => {
-    if (model && pixels.length) {
+    if (model && drawn) {
       const prediction = model.predict(tf.tensor(pixels, [1, 784]));
       prediction.data().then((d) => {
         const prob = Math.max(...d);
@@ -33,7 +35,12 @@ const MNIST = () => {
         setProbability(prob);
       });
     }
-  }, [model, pixels])
+  }, [model, pixels, drawn]);
+
+  const handleDrawn = (p) => {
+    setPixels(p);
+    setDrawn(true);
+  };
 
   let message;
   if (digit >= 0) {
@@ -51,7 +58,7 @@ const MNIST = () => {
         Write a number here. Hopefully, the model is be able to read it.
         If not, my excuse is that I am new to this.
       </p>
-      <DrawingCanvas updatePixels={setPixels} />
+      <DrawingCanvas updatePixels={handleDrawn} />
       <p>
         {message}
       </p>
