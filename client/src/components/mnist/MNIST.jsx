@@ -7,6 +7,9 @@ import DrawingCanvas from './DrawingCanvas';
 
 const Wrapper = styled.div`
   margin: 0 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const MNIST = () => {
