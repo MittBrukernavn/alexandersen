@@ -28,6 +28,11 @@ const A = styled.a`
 
 const pages = [
   {
+    title: 'Neural Network Playground',
+    href: '/nn',
+    description: 'I try to get better at deep learning. Consider this a start.',
+  },
+  {
     title: 'Minesweeper',
     href: '/minesweeper',
     description: 'Another game I made, this one after my final exam.',
