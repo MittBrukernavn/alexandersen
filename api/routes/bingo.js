@@ -1,7 +1,6 @@
 const express = require('express');
 
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 
 const { connect, connectPool } = require('../db/connections');
 
@@ -83,12 +82,11 @@ router.put('/:id/request', async (req, res) => {
   }
 });
 
-/* here and down is admin functionality */
+// here and down is admin functionality
 
 router.use(adminOnly);
 
-/* add a new bingo board, with a name, optional free space, description, and list of prompts
-   token is a jsonwebtoken, which should validate that the logged inn person is admin */
+// add a new bingo board, with a name, optional free space, description, and list of prompts
 
 router.put('/', async (req, res) => {
   const {
@@ -124,16 +122,6 @@ router.get('/:id/prompts', async (req, res) => {
 });
 
 router.put('/:id/prompts', async (req, res) => {
-  const { id } = req.params;
-  const { text, token } = req.body;
-  try {
-    const { JWT_KEY } = process.env;
-    jwt.verify(token, JWT_KEY);
-  } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
   try {
     const connection = await connect();
     const response = await connection.query('INSERT INTO Prompts(BingoID, PromptText) VALUES (?,?)', [id, text]);
@@ -191,19 +179,21 @@ router.post('/approveRequest/:id', async (req, res) => {
 
 
 router.post('/deleteRequest/:id', async (req, res) => {
-  const { token } = req.body;
-  const { id } = req.params;
-  try {
-    const { JWT_KEY } = process.env;
-    jwt.verify(token, JWT_KEY);
-  } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
   const connection = await connect();
   connection.query('DELETE FROM Request WHERE ID=?', [id]);
   connection.end();
   res.json({ status: 'ok' });
+});
+
+router.get('/backup', async (_req, res) => {
+  res.status(500).json({
+    error: 'Not implemented',
+  });
+});
+
+router.put('/backup', async (req, res) => {
+  const { data } = req.body;
+  res.json(data);
 });
 
 
