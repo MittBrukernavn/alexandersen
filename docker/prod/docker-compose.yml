@@ -27,8 +27,6 @@ services:
     build:
       context: ../..
       dockerfile: ./docker/prod/Dockerfile.express
-    volumes:
-      - ./data/certbot/conf
     env_file:
       - ../../api/.env
   flask:
