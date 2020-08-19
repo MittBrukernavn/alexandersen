@@ -6,7 +6,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # docker sock
+      - /var/run/docker.sock:/tmp/docker.sock:ro # docker sock
       - /srv/nginx/certs:/etc/nginx/certs
       - /srv/nginx/vhost.d:/etc/nginx/vhost.d
       - nginx-proxy-html:/usr/share/nginx/html
@@ -14,7 +14,7 @@ services:
   letsencrypt-nginx-proxy-companion:
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro # docker sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro # docker sock
       - /srv/nginx/certs:/etc/nginx/certs
       - /srv/nginx/vhost.d:/etc/nginx/vhost.d
       - nginx-proxy-html:/usr/share/nginx/html
