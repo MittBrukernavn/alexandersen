@@ -1,0 +1,37 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ../..
+      dockerfile: ./docker/prod/Dockerfile.frontend
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    - ports:
+      - 80:80
+      - 443:443
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+  database:
+    build:
+      context: ../..
+      dockerfile: ./docker/prod/Dockerfile.mysql
+    volumes:
+      - /srv/prod:/var/lib/mysql
+    env_file:
+      - ../sql.env
+  express:
+    build:
+      context: ../..
+      dockerfile: ./docker/prod/Dockerfile.express
+    volumes:
+      - ./data/certbot/conf
+    env_file:
+      - ../../api/.env
+  flask:
+    build:
+      context: ../..
+      dockerfile: ./docker/prod/Dockerfile.flask

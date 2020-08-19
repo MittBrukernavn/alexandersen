@@ -1,0 +1,11 @@
+FROM 3.8.5-alpine3.12
+
+WORKDIR /pyapi
+
+COPY ./pyapi/requirements.txt .
+
+RUN pip3 install --no-cache -r requirements.txt
+
+COPY ./pyapi/app .
+
+CMD ["gunicorn", "--chdir", "app", "main:app", "--worker-class=gevent"]

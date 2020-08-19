@@ -4,29 +4,29 @@ services:
     tty: true
     build:
       context: ../..
-      dockerfile: './docker/dev/Dockerfile.frontend'
+      dockerfile: ./docker/dev/Dockerfile.frontend
     volumes:
       - ../../client:/client
   database:
     build:
       context: ../..
-      dockerfile: './docker/dev/Dockerfile.mysql'
+      dockerfile: ./docker/dev/Dockerfile.mysql
     volumes:
       - /srv/dev:/var/lib/mysql
     env_file:
       - ../sql.env
   express:
     build:
-      context: '../..'
-      dockerfile: './docker/dev/Dockerfile.express'
+      context: ../..
+      dockerfile: ./docker/dev/Dockerfile.express
     volumes:
       - ../../api:/api
     env_file:
       - ../../api/.env
   flask:
     build:
-      context: '../..'
-      dockerfile: './docker/dev/Dockerfile.flask'
+      context: ../..
+      dockerfile: ./docker/dev/Dockerfile.flask
     volumes:
       - ../../pyapi:/pyapi
   nginx:
