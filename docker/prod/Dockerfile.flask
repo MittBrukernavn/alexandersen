@@ -1,11 +1,14 @@
-FROM python:3.8.5-alpine3.12
+FROM python:3.8.5-slim
+
+RUN apt update && apt upgrade -y
+RUN apt install build-essential libffi-dev -y
 
 WORKDIR /pyapi
 
 COPY ./pyapi/requirements.txt .
 
-RUN pip3 install --no-cache -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY ./pyapi/app .
+COPY ./pyapi/app /pyapi/app
 
 CMD ["gunicorn", "--chdir", "app", "main:app", "--worker-class=gevent"]

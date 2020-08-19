@@ -35,6 +35,9 @@ api/node_modules
 api/.env
 docker/**/*.env
 
+# mounted data
+docker/prod/data
+
 # ssl-keys
 api/key.pem
 api/cert.pem

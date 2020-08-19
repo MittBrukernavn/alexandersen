@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.11
+FROM node:lts-alpine3.11 AS build-stage
 
 COPY ./client /client
 
@@ -6,10 +6,10 @@ WORKDIR /client
 
 RUN npm install --only=prod --no-cache
 
-RUN npm build --no-cache
+RUN npm run build
 
-FROM nginx:stable-alpine
+FROM nginx:stable-alpine AS deploy-stage
 
-COPY --from=0 ./build /var/www/html
+COPY --from=build-stage /client/build /var/www/html
 
 COPY ./docker/prod/nginx.conf /etc/nginx/nginx.conf
