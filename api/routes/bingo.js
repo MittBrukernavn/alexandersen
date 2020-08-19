@@ -122,6 +122,8 @@ router.get('/:id/prompts', async (req, res) => {
 });
 
 router.put('/:id/prompts', async (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
   try {
     const connection = await connect();
     const response = await connection.query('INSERT INTO Prompts(BingoID, PromptText) VALUES (?,?)', [id, text]);

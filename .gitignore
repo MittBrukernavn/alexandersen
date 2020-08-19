@@ -33,6 +33,7 @@ api/node_modules
 
 # environment
 api/.env
+docker/**/*.env
 
 # ssl-keys
 api/key.pem

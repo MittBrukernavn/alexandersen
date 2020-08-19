@@ -1,0 +1,9 @@
+FROM mysql:8.0
+
+RUN echo $MYSQL_DATABASE
+
+COPY ./docker/sqlScripts/*.sql /docker-entrypoint-initdb.d/
+
+COPY ./docker/sqlScripts/mycustom.cnf /etc/mysql/conf.d/mycustom.cnf
+
+CMD ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
