@@ -1,30 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-flow: column;
-  width: 90vw;
-  max-width: 50em;
-  min-height: 20em;
-  background-color: white;
-  margin: 0.5em auto;
-  border-radius: 1em;
-  padding: 0.5em;
-`;
-
-const Card = styled.div`
-  margin: 0.5em;
-  padding: 0.5em;
-  border: 1px solid #eee;
-  border-radius: 0.5em;
-`;
-
-const A = styled.a`
-  color: #2dd;
-  text-decoration: none;
-`;
+import PageIndex from '../general/PageIndex';
 
 const pages = [
   {
@@ -57,16 +33,7 @@ const pages = [
 ];
 
 const Body = () => (
-  <Wrapper>
-    {
-      pages.map(({ title, href, description }) => (
-        <Card>
-          <h2><A href={href}>{title}</A></h2>
-          <p>{description}</p>
-        </Card>
-      ))
-    }
-  </Wrapper>
+  <PageIndex pages={pages} />
 );
 
 export default Body;

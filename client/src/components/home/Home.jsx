@@ -1,24 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Background from '../general/Background';
 import Body from './Body';
 
-const Wrapper = styled.div`
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #dadada;
-`;
 
 const H1 = styled.h1`
   font-size: 2em;
   margin: 0px;
-  text-align: center;
 `;
 
 const CVPlug = styled.h2`
   font-size: 1.2em;
   margin: 0px;
-  text-align: center;
 `;
 
 const A = styled.a`
@@ -27,11 +21,11 @@ const A = styled.a`
 `;
 
 const Home = () => (
-  <Wrapper>
+  <Background>
     <H1>Welcome to my humble site</H1>
     <CVPlug><A href="/cv.pdf" target="_blank">(Wait, who is this?)</A></CVPlug>
     <Body />
-  </Wrapper>
+  </Background>
 );
 
 export default Home;
