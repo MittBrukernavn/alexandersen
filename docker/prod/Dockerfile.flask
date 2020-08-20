@@ -11,4 +11,4 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./pyapi/app /pyapi/app
 
-CMD ["gunicorn", "--chdir", "app", "main:app", "--worker-class=gevent"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--chdir", "app", "main:app", "--worker-class=gevent"]
