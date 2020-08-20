@@ -11,7 +11,7 @@ const SplashPage = () => {
     {
       title: 'MNIST',
       href: 'mnist',
-    }
+    },
   ];
 
   return (
@@ -19,8 +19,6 @@ const SplashPage = () => {
       <h1>Did anyone say neural nets?</h1>
       <p>
         I play with some on this page.
-        My current main project is a CNN for recognizing handwritten digits, using the MNIST dataset.
-        It's not original, but it's easy to deal with for now. Maybe more soon? We will see.
       </p>
       {pages.map(({ title, href }) => <a href={`/nn/${href}`}>{title}</a>)}
     </Wrapper>

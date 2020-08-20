@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import SplashPage from './SplashPage';
-import MNIST from '../mnist/MNIST';
+import MNIST from './mnist/MNIST';
 
 const NeuralNets = () => (
   <BrowserRouter>

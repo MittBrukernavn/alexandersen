@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import * as tf from '@tensorflow/tfjs';
 
-import zeros from '../../utils/zeros';
+import zeros from '../../../utils/zeros';
 import DrawingCanvas from './DrawingCanvas';
 
 const Wrapper = styled.div`
@@ -22,7 +22,6 @@ const MNIST = () => {
   useEffect(() => {
     const internal = async () => {
       const m = await tf.loadLayersModel('/tfjs-mnist/model.json');
-      console.log(m);
       setModel(m);
     };
     internal();
@@ -47,7 +46,17 @@ const MNIST = () => {
 
   let message;
   if (digit >= 0) {
-    message = `My model is ${probability*100}% certain you wrote a ${digit}.`;
+    if (probability < 0.5) {
+      message = `My model doesn't have a clue, but its best guess is ${digit}`;
+    } else if (probability < 0.75) {
+      message = `My model believes this is a ${digit}, but isn't quite sure.`;
+    } else if (probability < 0.95) {
+      message = `My model believes quite strongly this is a ${digit}`;
+    } else if (probability < 0.999) {
+      message = `My model is very confident this is a ${digit}`;
+    } else {
+      message = `My model is completely sure this is a ${digit}`;
+    }
   } else if (model) {
     message = 'Start drawing and I\'ll try to read it!';
   } else {

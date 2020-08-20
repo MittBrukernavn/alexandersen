@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -16,35 +17,33 @@ const Canvas = styled.canvas`
 
 const DrawingCanvas = ({ updatePixels }) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [brushSize, setBrushSize] = useState(5)
+  const [brushSize, setBrushSize] = useState(5);
 
   const addPoint = (ctx, x, y) => {
     ctx.beginPath();
-    ctx.arc(x, y, brushSize, 0, 2*Math.PI);
+    ctx.arc(x, y, brushSize, 0, 2 * Math.PI);
     ctx.fillStyle = 'black';
     ctx.fill();
     const { data } = ctx.getImageData(0, 0, 280, 280);
     // update pixels in parent component
     const pixels = [];
-    for(let imgY = 0; imgY < 28; imgY++) {
-      for(let imgX = 0; imgX < 28; imgX++) {
+    for (let imgY = 0; imgY < 28; imgY++) {
+      for (let imgX = 0; imgX < 28; imgX++) {
         let thispixel = 0;
-        for(let i = 0; i < 10; i++) {
-          for(let j = 0; j < 10; j++) {
-            const imgIndex = (imgX*10 + i) + 280 * (imgY*10 + j);
+        for (let i = 0; i < 10; i++) {
+          for (let j = 0; j < 10; j++) {
+            const imgIndex = (imgX * 10 + i) + 280 * (imgY * 10 + j);
             thispixel += data[4 * imgIndex + 3];
           }
         }
-        console.log(thispixel);
         pixels.push(thispixel / 100);
       }
     }
     updatePixels(pixels);
-    console.log(Math.max(...pixels));
-  }
+  };
 
   const mouseDraw = (e) => {
-    if(isDrawing) {
+    if (isDrawing) {
       const { target, clientX, clientY } = e;
       const { offsetLeft, offsetTop } = target;
       const x = Math.floor((clientX - offsetLeft) / 1.5);
@@ -52,20 +51,20 @@ const DrawingCanvas = ({ updatePixels }) => {
       const ctx = target.getContext('2d');
       addPoint(ctx, x, y);
     }
-  }
+  };
 
   const touchDraw = (e) => {
     e.preventDefault();
     const { target, touches } = e;
     const ctx = target.getContext('2d');
     const { top, left } = target.getBoundingClientRect();
-    for(let i = 0; i < touches.length; i++) {
+    for (let i = 0; i < touches.length; i++) {
       const { pageX, pageY } = touches[i];
       const x = Math.floor((pageX - left) / 1.5);
       const y = Math.floor((pageY - top) / 1.5);
       addPoint(ctx, x, y);
     }
-  }
+  };
 
   return (
     <Wrapper>
@@ -75,6 +74,7 @@ const DrawingCanvas = ({ updatePixels }) => {
         onMouseDown={() => setIsDrawing(true)}
         onMouseUp={() => setIsDrawing(false)}
         onMouseOut={() => setIsDrawing(false)}
+        onBlur={() => setIsDrawing(false)}
         onMouseMove={mouseDraw}
         onTouchStart={touchDraw}
         onTouchMove={touchDraw}
@@ -92,6 +92,10 @@ const DrawingCanvas = ({ updatePixels }) => {
       </label>
     </Wrapper>
   );
+};
+
+DrawingCanvas.propTypes = {
+  updatePixels: PropTypes.func.isRequired,
 };
 
 export default DrawingCanvas;
