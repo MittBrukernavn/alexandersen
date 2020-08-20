@@ -9,7 +9,13 @@ const pages = [
     title: 'MNIST',
     href: '/nn/mnist',
     description: `A neural network for recognizing handwritten digits,
-      trained on the MNIST dataset`,
+      trained on the MNIST dataset.`,
+  },
+  {
+    title: 'Yelp',
+    href: '/nn/yelp',
+    description: `A neural network trying to classify positive and negative reviews, trained on
+      yelp reviews.`,
   },
 ];
 
