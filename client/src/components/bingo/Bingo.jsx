@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
+import Background from '../general/Background';
+import Body from '../general/Body';
 import Row from './Row';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 const H1 = styled.h1`
   text-align: center;
@@ -146,7 +142,7 @@ const Bingo = () => {
   };
 
   return (
-    <Wrapper>
+    <Background>
       <H1>
         <select value={bingoId} onChange={chooseBingo}>
           {bingoId === 0 ? <option value={0}>Velg en</option> : null}
@@ -155,19 +151,21 @@ const Bingo = () => {
         -bingo
       </H1>
       <p>{description}</p>
-      <Board>
-        <tbody>
-          {rows.map((row, rowNumber) => (
-            // eslint-disable-next-line
-            <Row key={rowNumber} data={row} rowIndex={rowNumber} toggle={toggleChosen} />
-          ))}
-        </tbody>
-      </Board>
-      <p>
-        Har du lyst til å legge til flere felt til bingoen, kan du gjøre det
-        <a href="/bingo/request">her</a>
-      </p>
-    </Wrapper>
+      <Body>
+        <Board>
+          <tbody>
+            {rows.map((row, rowNumber) => (
+              // eslint-disable-next-line
+              <Row key={rowNumber} data={row} rowIndex={rowNumber} toggle={toggleChosen} />
+            ))}
+          </tbody>
+        </Board>
+        <p>
+          Har du lyst til å legge til flere felt til bingoen, kan du gjøre det
+          <a href="/bingo/request">her</a>
+        </p>
+      </Body>
+    </Background>
   );
 };
 

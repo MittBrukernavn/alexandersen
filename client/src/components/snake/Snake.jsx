@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  margin: auto;
-`;
+import Background from '../general/Background';
+import Body from '../general/Body';
 
 const Canvas = styled.canvas`
   height: 500px;
   width: 500px;
   border: 2px solid black;
+`;
+
+const H3 = styled.h3`
+  margin: 0;
 `;
 
 const Snake = () => {
@@ -137,13 +140,15 @@ const Snake = () => {
   }, [snake]);
 
   return (
-    <Wrapper>
-      <h3>
+    <Background>
+      <H3>
         Score:
         {apples}
-      </h3>
-      <Canvas ref={canvasRef} width={1000} height={1000} />
-    </Wrapper>
+      </H3>
+      <Body>
+        <Canvas ref={canvasRef} width={1000} height={1000} />
+      </Body>
+    </Background>
   );
 };
 

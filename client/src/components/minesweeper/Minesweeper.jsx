@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import MinesweeperTile from './MinesweeperTile';
-
-const Wrapper = styled.div`
-`;
+import Background from '../general/Background';
+import Body from '../general/Body';
 
 const Table = styled.table`
   margin: auto;
@@ -90,34 +89,36 @@ const Minesweeper = () => {
   }, []);
 
   return (
-    <Wrapper>
-      <Table>
-        <tbody>
-          {
-            board.map((row, rowNumber) => (
-              // using rownumber/colnumber for this purpose works, since it can't change in runtime
-              // eslint-disable-next-line
-              <tr key={rowNumber}>
-                {row.map((tile, colNumber) => {
-                  const { bomb, checked, num } = tile;
-                  return (
-                    <MinesweeperTile
-                      // eslint-disable-next-line
-                      key={colNumber}
-                      bomb={bomb}
-                      tested={checked}
-                      num={num}
-                      onClick={() => clicked(rowNumber, colNumber)}
-                    />
-                  );
-                })}
-              </tr>
-            ))
+    <Background>
+      <Body>
+        <Table>
+          <tbody>
+            {
+              board.map((row, rowNumber) => (
+                // using rownumber/colnumber for this purpose works, since it can't change
+                // eslint-disable-next-line
+                <tr key={rowNumber}>
+                  {row.map((tile, colNumber) => {
+                    const { bomb, checked, num } = tile;
+                    return (
+                      <MinesweeperTile
+                        // eslint-disable-next-line
+                        key={colNumber}
+                        bomb={bomb}
+                        tested={checked}
+                        num={num}
+                        onClick={() => clicked(rowNumber, colNumber)}
+                      />
+                    );
+                  })}
+                </tr>
+              ))
 
-          }
-        </tbody>
-      </Table>
-    </Wrapper>
+            }
+          </tbody>
+        </Table>
+      </Body>
+    </Background>
   );
 };
 

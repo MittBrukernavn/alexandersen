@@ -15,7 +15,6 @@ const Yelp = () => {
     const res = await fetch(`/pyapi/yelp/${review}`);
     const t = await res.text();
     const prob = parseFloat(t);
-    console.log(t);
     if (prob < 0.1) {
       setVerdict(`Very negative review (${t})`);
     } else if (prob < 0.5) {
@@ -32,7 +31,7 @@ const Yelp = () => {
 
   return (
     <Background>
-      <h1>Hey</h1>
+      <h1>Review sentiment analysis</h1>
       <Body>
         <input
           type="text"
