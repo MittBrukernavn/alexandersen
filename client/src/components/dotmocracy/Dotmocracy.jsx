@@ -9,7 +9,6 @@ const Dotmocracy = () => {
 
   useEffect(() => {
     socket.on('message', (s) => {
-      console.log(messages);
       setMessages((msgs) => [...msgs, s]);
     });
   }, []);

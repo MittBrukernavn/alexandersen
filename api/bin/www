@@ -96,7 +96,7 @@ server.on('listening', onListening);
 const io = sio.listen(server);
 
 io.on('connection', (socket) => {
-  socket.emit('message1', 'Hello');
-  socket.emit('message2', 'How goes it?');
-  socket.emit('message3', 'I like trains.');
+  socket.emit('message', 'Hello');
+  socket.emit('message', 'How goes it?');
+  socket.emit('message', 'I like trains.');
 });
