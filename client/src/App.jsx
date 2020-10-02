@@ -9,6 +9,7 @@ import ChristmasTree from './components/christmas-binary-tree/ChristmasTree';
 import Snake from './components/snake/Snake';
 import Minesweeper from './components/minesweeper/Minesweeper';
 import NeuralNets from './components/neural-nets/NeuralNets';
+import Dotmocracy from './components/dotmocracy/Dotmocracy';
 
 import Login from './components/admin/Login';
 import AdminPanel from './components/admin/AdminPanel';
@@ -26,6 +27,7 @@ function App() {
       <Route path="/christmastree" exact component={ChristmasTree} />
       <Route path="/minesweeper" component={Minesweeper} />
       <Route path="/snake" component={Snake} />
+      <Route path="/dotmocracy" component={Dotmocracy} />
       <Route path="/admin" exact component={() => <Redirect to="/admin/login" />} />
       <Route path="/admin/login" component={Login} />
       <Route path="/admin/main" component={AdminPanel} />

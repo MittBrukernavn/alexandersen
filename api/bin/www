@@ -5,8 +5,8 @@
  */
 const debug = require('debug')('api:server');
 const http = require('http');
-const https = require('https');
-const fs = require('fs');
+const sio = require('socket.io');
+
 
 const app = require('../app');
 
@@ -42,18 +42,7 @@ app.set('port', port);
  */
 
 
-let server = http.createServer(app);
-
-try {
-  const key = fs.readFileSync('./key.pem');
-  const cert = fs.readFileSync('./cert.pem');
-  server = https.createServer({
-    key,
-    cert,
-  }, app);
-} catch (_err) {
-  console.log('Starting server as http');
-}
+const server = http.createServer(app);
 
 /**
  * Event listener for HTTP server "error" event.
@@ -102,3 +91,12 @@ function onListening() {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+// websocket handler for dotmocracy
+const io = sio.listen(server);
+
+io.on('connection', (socket) => {
+  socket.emit('message1', 'Hello');
+  socket.emit('message2', 'How goes it?');
+  socket.emit('message3', 'I like trains.');
+});
