@@ -102,27 +102,27 @@ const dotmocracy = io.of('/dotmocracy');
 const names = {};
 const dotmocracies = {};
 
+
 dotmocracy.on('connection', (socket) => {
   socket.on('name', (name) => {
-    if (name.trim()) {
-      console.log(`Registering user ID ${socket.client.id} with name ${name}`);
+    const trimmedName = name.trim();
+    socket.emit('msg', trimmedName);
+    if (trimmedName) {
       const oldname = names[socket.client.id];
       if (oldname) {
-        io.to(socket.client.id).emit('msg', `Changing name from  ${oldname} to ${name.trim()}`);
+        socket.emit('msg', `Changing name from  ${oldname} to ${trimmedName}`);
       } else {
-        io.to(socket.client.id).emit('msg', `Setting name to ${name.trim()}`);
+        socket.emit('msg', `Setting name to ${trimmedName}`);
       }
-      names[socket.client.id] = name.trim();
+      names[socket.client.id] = trimmedName;
     }
-    console.log(names);
   });
 
   socket.on('room', (room) => {
     const userId = socket.client.id;
     const nameOfUser = names[userId];
-    console.log(userId);
     if (!nameOfUser) {
-      console.log(`No name found for userId ${userId}`);
+      socket.emit('msg', 'No name found for your user id');
       // consider giving an error
       return;
     }
@@ -141,8 +141,6 @@ dotmocracy.on('connection', (socket) => {
     } else {
       dotmocracies[room].members.push(userId);
     }
-    console.log(`Welcome to room ${room}.\nThe decider in this room is ${names[dotmocracies[room].decider]}`);
-    console.log(`${nameOfUser} joined the room!`);
     socket.emit('msg', `Welcome to room ${room}.\nThe decider in this room is ${names[dotmocracies[room].decider]}`);
     socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
   });
