@@ -5,7 +5,7 @@
  */
 const debug = require('debug')('api:server');
 const http = require('http');
-const sio = require('socket.io');
+const socketio = require('socket.io');
 
 
 const app = require('../app');
@@ -93,10 +93,57 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 // websocket handler for dotmocracy
-const io = sio.listen(server);
+const io = socketio.listen(server);
 
-io.on('connection', (socket) => {
-  socket.emit('message', 'Hello');
-  socket.emit('message', 'How goes it?');
-  socket.emit('message', 'I like trains.');
+const dotmocracy = io.of('/dotmocracy');
+
+
+// in-memory cause I don't need these to persist (that will be a project for another day)
+const names = {};
+const dotmocracies = {};
+
+dotmocracy.on('connection', (socket) => {
+  socket.on('name', (name) => {
+    if (name.trim()) {
+      console.log(`Registering user ID ${socket.client.id} with name ${name}`);
+      const oldname = names[socket.client.id];
+      if (oldname) {
+        io.to(socket.client.id).emit('msg', `Changing name from  ${oldname} to ${name.trim()}`);
+      } else {
+        io.to(socket.client.id).emit('msg', `Setting name to ${name.trim()}`);
+      }
+      names[socket.client.id] = name.trim();
+    }
+    console.log(names);
+  });
+
+  socket.on('room', (room) => {
+    const userId = socket.client.id;
+    const nameOfUser = names[userId];
+    console.log(userId);
+    if (!nameOfUser) {
+      console.log(`No name found for userId ${userId}`);
+      // consider giving an error
+      return;
+    }
+    socket.join(room);
+    if (dotmocracies[room] === undefined) {
+      dotmocracies[room] = {
+        postits: [],
+        members: [{
+          userId,
+          votesCast: 0,
+        }],
+        normalPersonVotes: 5,
+        deciderVotes: 1,
+        decider: userId,
+      };
+    } else {
+      dotmocracies[room].members.push(userId);
+    }
+    console.log(`Welcome to room ${room}.\nThe decider in this room is ${names[dotmocracies[room].decider]}`);
+    console.log(`${nameOfUser} joined the room!`);
+    socket.emit('msg', `Welcome to room ${room}.\nThe decider in this room is ${names[dotmocracies[room].decider]}`);
+    socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
+  });
 });
