@@ -106,7 +106,6 @@ const dotmocracies = {};
 dotmocracy.on('connection', (socket) => {
   socket.on('name', (name) => {
     const trimmedName = name.trim();
-    socket.emit('msg', trimmedName);
     if (trimmedName) {
       const oldname = names[socket.client.id];
       if (oldname) {
@@ -127,21 +126,41 @@ dotmocracy.on('connection', (socket) => {
       return;
     }
     socket.join(room);
+    const userData = {
+      userId,
+      name: nameOfUser,
+      votesCast: 0,
+    };
     if (dotmocracies[room] === undefined) {
       dotmocracies[room] = {
         postits: [],
-        members: [{
-          userId,
-          votesCast: 0,
-        }],
-        normalPersonVotes: 5,
+        members: [userData],
+        normalVotes: 5,
         deciderVotes: 1,
         decider: userId,
+        counter: 1,
       };
+      socket.emit('msg', `Room ${room} created`);
     } else {
-      dotmocracies[room].members.push(userId);
+      dotmocracies[room].members.push(userData);
+      socket.emit('msg', `Welcome to room ${room}.`);
     }
-    socket.emit('msg', `Welcome to room ${room}.\nThe decider in this room is ${names[dotmocracies[room].decider]}`);
+    socket.emit('init room', dotmocracies[room]);
     socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
+    socket.in(room).emit('new user', userData);
   });
+});
+
+dotmocracy.on('disconnect', (socket) => {
+  const room = Object.keys(dotmocracies).find((roomname) => (
+    dotmocracies[roomname].members.find(({ userId }) => userId === socket.client.id)));
+  if (room) {
+    dotmocracies[room].members = dotmocracies[room].members
+      .filter(({ userId }) => userId !== socket.client.id);
+    io.in(room).emit('remove user', socket.client.id);
+    if (dotmocracies[room].members.length === 0) {
+      delete dotmocracies[room];
+    }
+  }
+  delete names[socket.client.id];
 });

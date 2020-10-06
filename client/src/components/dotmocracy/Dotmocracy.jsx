@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 import Background from '../general/Background';
+import Members from './Members';
 
 // declare this outside the component to avoid it re-connecting on any function call
 let socket;
 
 const Dotmocracy = () => {
   // const [postits, setPostits] = useState([]);
+  const [postits, setPostits] = useState([]);
+  const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [name, setName] = useState('');
 
@@ -17,6 +20,26 @@ const Dotmocracy = () => {
 
     socket.on('msg', (msg) => {
       setMessages((prev) => [...prev, msg]);
+    });
+
+    socket.on('init room', (roomdata) => {
+      const {
+        postits: receivedPostits,
+        members: receivedMembers,
+        // normalVotes,
+        // deciderVotes,
+        // decider
+      } = roomdata;
+      setPostits(receivedPostits);
+      setMembers(receivedMembers);
+    });
+
+    socket.on('new user', (user) => {
+      setMembers((prev) => [...prev, user]);
+    });
+
+    socket.on('remove user', (userId) => {
+      setMembers((prev) => prev.filter((user) => userId !== user.userId));
     });
   }, []);
 
@@ -34,6 +57,7 @@ const Dotmocracy = () => {
         // eslint-disable-next-line react/no-array-index-key
         <p key={i}>{msg}</p>
       ))}
+      <Members members={members} />
     </Background>
   );
 };
