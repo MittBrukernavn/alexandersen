@@ -1,10 +1,12 @@
 FROM node:lts-alpine3.11 AS build-stage
 
-COPY ./client /client
-
 WORKDIR /client
 
+COPY ./client/* ./
+
 RUN npm install --only=prod --no-cache
+
+COPY ./client ./
 
 RUN npm run build
 
