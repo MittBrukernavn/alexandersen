@@ -149,18 +149,25 @@ dotmocracy.on('connection', (socket) => {
     socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
     socket.in(room).emit('new user', userData);
   });
-});
 
-dotmocracy.on('disconnect', (socket) => {
-  const room = Object.keys(dotmocracies).find((roomname) => (
-    dotmocracies[roomname].members.find(({ userId }) => userId === socket.client.id)));
-  if (room) {
-    dotmocracies[room].members = dotmocracies[room].members
-      .filter(({ userId }) => userId !== socket.client.id);
-    io.in(room).emit('remove user', socket.client.id);
-    if (dotmocracies[room].members.length === 0) {
-      delete dotmocracies[room];
+  socket.on('disconnect', () => {
+    /* const descriptions = {
+      'server namespace disconnect': 'Disconnected by server',
+      'client namespace disconnect': 'User left',
+      'ping timeout': 'Client was not responding to pings',
+      'transport close': 'Client stopped sending data',
+    };
+    const desc = descriptions[reason] || reason; // fall back on reason "code" */
+    const room = Object.keys(dotmocracies).find((roomname) => (
+      dotmocracies[roomname].members.find(({ userId }) => userId === socket.client.id)));
+    if (room) {
+      dotmocracies[room].members = dotmocracies[room].members
+        .filter(({ userId }) => userId !== socket.client.id);
+      socket.in(room).emit('remove user', socket.client.id);
+      if (dotmocracies[room].members.length === 0) {
+        delete dotmocracies[room];
+      }
     }
-  }
-  delete names[socket.client.id];
+    delete names[socket.client.id];
+  });
 });
