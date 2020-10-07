@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -20,20 +20,31 @@ const H2 = styled.h2`
 margin: 0px  0px;
 `;
 
-const Members = ({ members, decider }) => (
-  <Wrapper>
-    <H2>Connected users: </H2>
-    <Ul>
-      {members.map(({ userId, name, votesCast }) => (
-        <li key={userId}>
-          {userId === decider
-            ? <Decider>{name}</Decider>
-            : `${name}: ${votesCast}`}
-        </li>
-      ))}
-    </Ul>
-  </Wrapper>
-);
+const Members = ({ members, decider }) => {
+  const [expand, setExpand] = useState(false);
+  if (expand) {
+    return (
+      <Wrapper>
+        <H2>Connected users: </H2>
+        <Ul>
+          {members.map(({ userId, name }) => (
+            <li key={userId}>
+              {userId === decider
+                ? <Decider>{name}</Decider>
+                : name}
+            </li>
+          ))}
+        </Ul>
+        <button type="button" onClick={() => setExpand(false)}>Hide users</button>
+      </Wrapper>
+    );
+  }
+  return (
+    <Wrapper>
+      <button type="button" onClick={() => setExpand(true)}>Show members</button>
+    </Wrapper>
+  );
+};
 
 Members.propTypes = {
   members: PropTypes.arrayOf(PropTypes.shape({
