@@ -1,13 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-const Members = ({ members }) => (
+const Decider = styled.span`
+color: red;
+`;
+
+const Ul = styled.ul`
+  text-align: left;
+`;
+
+const Members = ({ members, decider }) => (
   <div>
-    {members.map(({ userId, name, votesCast }) => (
-      <p key={userId}>
-        {`${name}: ${votesCast}`}
-      </p>
-    ))}
+    <h2>Connected users: </h2>
+    <Ul>
+      {members.map(({ userId, name, votesCast }) => (
+        <li key={userId}>
+          {userId === decider
+            ? <Decider>{name}</Decider>
+            : `${name}: ${votesCast}`}
+        </li>
+      ))}
+    </Ul>
   </div>
 );
 
@@ -17,6 +31,11 @@ Members.propTypes = {
     name: PropTypes.string.isRequired,
     votesCast: PropTypes.number.isRequired,
   })).isRequired,
+  decider: PropTypes.string,
+};
+
+Members.defaultProps = {
+  decider: null,
 };
 
 export default Members;

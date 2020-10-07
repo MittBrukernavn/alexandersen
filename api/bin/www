@@ -125,6 +125,7 @@ dotmocracy.on('connection', (socket) => {
       // consider giving an error
       return;
     }
+    // TODO: check for existing rooms
     socket.join(room);
     const userData = {
       userId,
