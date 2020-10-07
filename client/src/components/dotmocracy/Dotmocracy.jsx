@@ -4,35 +4,23 @@ import io from 'socket.io-client';
 import Background from '../general/Background';
 import Body from '../general/Body';
 import Members from './Members';
+import Setup from './Setup';
 
 
 // declare this outside the component to avoid it re-connecting on any function call
-let socket;
+const socket = io('/dotmocracy');
 
 const Dotmocracy = () => {
   // const [postits, setPostits] = useState([]);
-  const [phase, setPhase] = useState('choose name');
-  const [name, setName] = useState('');
-  const [roomName, setRoomName] = useState('TMM4220');
+  const [phase, setPhase] = useState('setup');
   const [postits, setPostits] = useState([]);
   const [members, setMembers] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [roomInfo, setRoomInfo] = useState({});
 
-  // creates a callback for setting the phase if the parameter is set to true
-  const setPhaseOnSuccess = (newPhase) => (success) => {
-    if (success) {
-      setPhase(newPhase);
-    }
-  };
-
   useEffect(() => {
-    socket = io('/dotmocracy');
     window.io = socket;
 
-    socket.on('msg', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
+    socket.on('msg', console.log);
 
     socket.on('init room', (roomdata) => {
       const {
@@ -53,40 +41,19 @@ const Dotmocracy = () => {
       setMembers((prev) => prev.filter((user) => userId !== user.userId));
     });
   }, []);
-  if (phase === 'choose name') {
+
+  if (phase === 'setup') {
     return (
       <Background>
-        <Body>
-          <h2>What is your name?</h2>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-          <button type="button" onClick={() => socket.emit('name', name, setPhaseOnSuccess('choose room'))}>
-            Register
-          </button>
-        </Body>
+        <Setup socket={socket} onFinish={() => setPhase('suggestions')} />
       </Background>
     );
   }
-  if (phase === 'choose room') {
-    return (
-      <Background>
-        <Body>
-          <h2>Enter a room to join</h2>
-          <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
-          <button type="button" onClick={() => socket.emit('room', 'TMM4220', setPhaseOnSuccess('room'))}>
-            Join room
-          </button>
-        </Body>
-      </Background>
-    );
-  }
+
   return (
     <Background>
       <Body>
         <Members members={members} decider={roomInfo.decider} />
-        {messages.map((msg, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <p key={i}>{msg}</p>
-        ))}
       </Body>
       {/* postits.map(({ id, text, dots }) => (
         <p key={id}>
