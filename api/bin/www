@@ -124,7 +124,6 @@ dotmocracy.on('connection', (socket) => {
     const nameOfUser = names[userId];
     if (!nameOfUser) {
       socket.emit('msg', 'No name found for your user id');
-      // consider giving an error
       ack(false);
       return;
     }

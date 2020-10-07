@@ -58,7 +58,7 @@ const Dotmocracy = () => {
       <Background>
         <Body>
           <h2>What is your name?</h2>
-          <input type="text" onChange={(e) => setName(e.target.value)} />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
           <button type="button" onClick={() => socket.emit('name', name, setPhaseOnSuccess('choose room'))}>
             Register
           </button>
