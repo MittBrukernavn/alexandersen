@@ -102,31 +102,39 @@ const dotmocracy = io.of('/dotmocracy');
 const names = {};
 const dotmocracies = {};
 
+const getroom = (userid) => (
+  Object.keys(dotmocracies).find((roomname) => (
+    dotmocracies[roomname].members.find(({ userId }) => userId === userid)))
+);
 
 dotmocracy.on('connection', (socket) => {
-  socket.on('name', (name) => {
+  socket.on('name', (name, ack) => {
+    const hasName = names[socket.client.id] !== undefined;
     const trimmedName = name.trim();
-    if (trimmedName) {
-      const oldname = names[socket.client.id];
-      if (oldname) {
-        socket.emit('msg', `Changing name from  ${oldname} to ${trimmedName}`);
-      } else {
-        socket.emit('msg', `Setting name to ${trimmedName}`);
-      }
+    if (!hasName && trimmedName) {
       names[socket.client.id] = trimmedName;
+      ack(true);
+    } else {
+      ack(false);
     }
   });
 
-  socket.on('room', (room) => {
+  socket.on('room', (room, ack) => {
     const userId = socket.client.id;
     const nameOfUser = names[userId];
     if (!nameOfUser) {
       socket.emit('msg', 'No name found for your user id');
       // consider giving an error
+      ack(false);
       return;
     }
-    // TODO: check for existing rooms
+    const existingRoom = getroom(userId);
+    if (existingRoom) {
+      ack(false);
+      return;
+    }
     socket.join(room);
+    ack(true);
     const userData = {
       userId,
       name: nameOfUser,
@@ -159,8 +167,7 @@ dotmocracy.on('connection', (socket) => {
       'transport close': 'Client stopped sending data',
     };
     const desc = descriptions[reason] || reason; // fall back on reason "code" */
-    const room = Object.keys(dotmocracies).find((roomname) => (
-      dotmocracies[roomname].members.find(({ userId }) => userId === socket.client.id)));
+    const room = getroom(socket.client.id);
     if (room) {
       dotmocracies[room].members = dotmocracies[room].members
         .filter(({ userId }) => userId !== socket.client.id);
