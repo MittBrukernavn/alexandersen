@@ -146,7 +146,6 @@ dotmocracy.on('connection', (socket) => {
         normalVotes: 5,
         deciderVotes: 1,
         decider: userId,
-        counter: 1,
       };
       socket.emit('msg', `Room ${room} created`);
     } else {
@@ -156,6 +155,50 @@ dotmocracy.on('connection', (socket) => {
     socket.emit('init room', dotmocracies[room]);
     socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
     socket.in(room).emit('new user', userData);
+  });
+
+  socket.on('make postit', (text, ack) => {
+    const room = getroom(socket.client.id);
+    if (!room) {
+      ack(false);
+      return;
+    }
+    const existingPostits = dotmocracies[room].postits;
+    if (existingPostits.find((existingPostit) => existingPostit.text === text)) {
+      ack(false);
+      return;
+    }
+    const newPostit = {
+      text,
+      dots: [],
+    };
+    dotmocracies[room].postits.push(newPostit);
+    socket.emit('new postit', newPostit);
+    socket.in(room).emit('new postit', newPostit);
+    ack(true);
+  });
+
+  socket.on('vote', (postit) => {
+    const room = getroom(socket.client.id);
+    if (!room) {
+      return;
+    }
+    const postitObj = dotmocracies[room].postits
+      .find(({ text }) => text === postit);
+    if (!postitObj) {
+      return;
+    }
+    const user = dotmocracies[room].members
+      .find(({ userId }) => userId === socket.client.id);
+    // TODO: check if the user is decider
+    if (user.votesCast >= dotmocracies[room].normalVotes) {
+      return;
+    }
+    const { dots } = postitObj;
+    dots.push(1); // TODO: use meaningful values
+    user.votesCast += 1;
+    socket.emit('new vote', postit);
+    socket.in(room).emit('new vote', postit);
   });
 
   socket.on('disconnect', () => {
