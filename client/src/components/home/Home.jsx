@@ -6,6 +6,11 @@ import PageIndex from '../general/PageIndex';
 
 const pages = [
   {
+    title: 'Dotmocracy',
+    href: '/dotmocracy',
+    description: 'Inspired by the course TMM4220 (Innovation by Design Thinking), I made a web application for "dotmocracy".',
+  },
+  {
     title: 'Neural Network Playground',
     href: '/nn',
     description: 'I try to get better at deep learning. Consider this a start.',

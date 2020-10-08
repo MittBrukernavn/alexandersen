@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -11,7 +12,7 @@ const Card = styled.div`
   border-radius: 0.5em;
 `;
 
-const A = styled.a`
+const A = styled(Link)`
   color: #2dd;
   text-decoration: none;
 `;
@@ -19,8 +20,8 @@ const A = styled.a`
 const PageIndex = ({ pages }) => (
   <Body>
     {pages.map(({ title, href, description }) => (
-      <Card>
-        <h2><A href={href}>{title}</A></h2>
+      <Card key={href}>
+        <h2><A to={href}>{title}</A></h2>
         <p>{description}</p>
       </Card>
     ))}
