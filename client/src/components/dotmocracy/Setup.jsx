@@ -7,7 +7,7 @@ import Body from '../general/Body';
 const Setup = ({ socket, onFinish }) => {
   const [phase, setPhase] = useState('choose name');
   const [name, setName] = useState('');
-  const [roomName, setRoomName] = useState('TMM4220');
+  const [roomName, setRoomName] = useState('');
 
   // creates a callback for setting the phase if the parameter is set to true
   const setPhaseOnSuccess = (newPhase) => (success) => {

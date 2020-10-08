@@ -178,7 +178,7 @@ dotmocracy.on('connection', (socket) => {
     ack(true);
   });
 
-  socket.on('vote', (postit) => {
+  socket.on('vote', (postit, coordinates) => {
     const room = getroom(socket.client.id);
     if (!room) {
       return;
@@ -195,10 +195,10 @@ dotmocracy.on('connection', (socket) => {
       return;
     }
     const { dots } = postitObj;
-    dots.push(1); // TODO: use meaningful values
+    dots.push(coordinates);
     user.votesCast += 1;
-    socket.emit('new vote', postit);
-    socket.in(room).emit('new vote', postit);
+    socket.emit('new vote', postit, coordinates);
+    socket.in(room).emit('new vote', postit, coordinates);
   });
 
   socket.on('disconnect', () => {

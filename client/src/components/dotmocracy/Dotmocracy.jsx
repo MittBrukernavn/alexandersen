@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import styled from 'styled-components';
 
 import Background from '../general/Background';
 import Body from '../general/Body';
@@ -8,6 +9,10 @@ import Setup from './Setup';
 import Postit from './Postit';
 import MakePostit from './MakePostit';
 
+const RowWrap = styled.div`
+display: flex;
+flex-flow: row wrap;
+`;
 
 // declare this outside the component to avoid it re-connecting on all method calls
 const socket = io('/dotmocracy');
@@ -23,8 +28,6 @@ const Dotmocracy = () => {
   });
 
   useEffect(() => {
-    window.io = socket;
-
     socket.on('msg', console.log);
 
     socket.on('init room', (roomdata) => {
@@ -50,12 +53,12 @@ const Dotmocracy = () => {
       setPostits((prev) => [...prev, newPostit]);
     });
 
-    socket.on('new vote', (newVote) => {
+    socket.on('new vote', (votedPostitText, coords) => {
       setPostits((prev) => {
         const postitsCopy = [...prev];
-        const votedPostit = postitsCopy.find(({ text }) => text === newVote);
+        const votedPostit = postitsCopy.find(({ text }) => text === votedPostitText);
         if (votedPostit) {
-          votedPostit.dots.push(1); // TODO: use meaningful values
+          votedPostit.dots = [...votedPostit.dots, coords]; // TODO: use meaningful values
         }
         return postitsCopy;
       });
@@ -72,7 +75,9 @@ const Dotmocracy = () => {
     <Background>
       <Body>
         <Members members={members} decider={roomInfo.decider} />
-        {postits.map((p) => <Postit key={p.text} postit={p} socket={socket} />)}
+        <RowWrap>
+          {postits.map((p) => <Postit key={p.text} postit={p} socket={socket} />)}
+        </RowWrap>
         <MakePostit socket={socket} />
       </Body>
     </Background>
