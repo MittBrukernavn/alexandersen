@@ -27,8 +27,8 @@ z-index: 10;
 overflow: scroll;
 `;
 
-const canvasHeight = 200;
-const canvasWidth = 200;
+const canvasHeight = 500;
+const canvasWidth = 500;
 
 const Postit = ({ postit, socket }) => {
   const canvasRef = useRef(null);
@@ -56,7 +56,7 @@ const Postit = ({ postit, socket }) => {
 
     dots.forEach(({ coordinates: [x, y], decider }) => {
       const color = decider ? 'red' : 'blue';
-      const radius = decider ? 8 : 4;
+      const radius = decider ? 20 : 10;
       ctx.beginPath();
       ctx.fillStyle = color;
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
