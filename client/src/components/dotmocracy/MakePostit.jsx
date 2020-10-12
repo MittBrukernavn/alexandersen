@@ -15,7 +15,7 @@ const MakePostit = ({ socket }) => {
           }
         })}
       >
-        Post it (get it?)
+        Post
       </button>
     </div>
   );

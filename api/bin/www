@@ -119,7 +119,50 @@ dotmocracy.on('connection', (socket) => {
     }
   });
 
-  socket.on('room', (room, ack) => {
+  socket.on('create room', (room, normalVotes, deciderVotes, ack) => {
+    const userId = socket.client.id;
+    const nameOfUser = names[userId];
+    if (!nameOfUser) {
+      socket.emit('msg', 'No name found for your user id');
+      ack(false);
+      return;
+    }
+    if (!room) {
+      socket.emit('msg', 'Room name cannot be empty');
+      ack(false);
+      return;
+    }
+    if (dotmocracies[room] !== undefined) {
+      socket.emit('msg', `Room ${room} already exists`);
+      ack(false);
+      return;
+    }
+    const existingRoom = getroom(userId);
+    if (existingRoom) {
+      socket.emit('msg', 'You are already in another room');
+      ack(false);
+      return;
+    }
+    socket.join(room);
+    const userData = {
+      userId,
+      name: nameOfUser,
+      votesCast: 0,
+    };
+    dotmocracies[room] = {
+      postits: [],
+      members: [userData],
+      normalVotes: normalVotes > 0 ? normalVotes : 5,
+      deciderVotes: deciderVotes > 0 ? deciderVotes : 1,
+      decider: userId,
+    };
+    socket.join(room);
+    socket.emit('msg', `Room ${room} created`);
+    socket.emit('init room', dotmocracies[room]);
+    ack(true);
+  });
+
+  socket.on('join room', (room, ack) => {
     const userId = socket.client.id;
     const nameOfUser = names[userId];
     if (!nameOfUser) {
@@ -132,6 +175,10 @@ dotmocracy.on('connection', (socket) => {
       ack(false);
       return;
     }
+    if (dotmocracies[room] === undefined) {
+      ack(false);
+      return;
+    }
     socket.join(room);
     ack(true);
     const userData = {
@@ -139,19 +186,8 @@ dotmocracy.on('connection', (socket) => {
       name: nameOfUser,
       votesCast: 0,
     };
-    if (dotmocracies[room] === undefined) {
-      dotmocracies[room] = {
-        postits: [],
-        members: [userData],
-        normalVotes: 5,
-        deciderVotes: 1,
-        decider: userId,
-      };
-      socket.emit('msg', `Room ${room} created`);
-    } else {
-      dotmocracies[room].members.push(userData);
-      socket.emit('msg', `Welcome to room ${room}.`);
-    }
+    dotmocracies[room].members.push(userData);
+    socket.emit('msg', `Welcome to room ${room}.`);
     socket.emit('init room', dotmocracies[room]);
     socket.in(room).emit('msg', `${nameOfUser} joined the room!`);
     socket.in(room).emit('new user', userData);
@@ -213,7 +249,9 @@ dotmocracy.on('connection', (socket) => {
     if (room) {
       dotmocracies[room].members = dotmocracies[room].members
         .filter(({ userId }) => userId !== socket.client.id);
+
       socket.in(room).emit('remove user', socket.client.id);
+
       if (dotmocracies[room].members.length === 0) {
         delete dotmocracies[room];
       }
