@@ -148,6 +148,7 @@ dotmocracy.on('connection', (socket) => {
       userId,
       name: nameOfUser,
       votesCast: 0,
+      isDecider: false,
     };
     dotmocracies[room] = {
       name: room,
@@ -155,7 +156,7 @@ dotmocracy.on('connection', (socket) => {
       members: [userData],
       normalVotes: normalVotes > 0 ? normalVotes : 5,
       deciderVotes: deciderVotes > 0 ? deciderVotes : 1,
-      decider: userId,
+      decider: null,
     };
     socket.join(room);
     socket.emit('msg', `Room ${room} created`);
@@ -186,6 +187,7 @@ dotmocracy.on('connection', (socket) => {
       userId,
       name: nameOfUser,
       votesCast: 0,
+      isDecider: false,
     };
     dotmocracies[room].members.push(userData);
     socket.emit('msg', `Welcome to room ${room}.`);
@@ -215,6 +217,32 @@ dotmocracy.on('connection', (socket) => {
     ack(true);
   });
 
+  socket.on('decider signup', () => {
+    const room = getroom(socket.client.id);
+    if (!room) {
+      socket.emit('msg', 'You are not a member of any rooms');
+    }
+    if (dotmocracies[room].decider) {
+      socket.emit('msg', 'Room already has a decider');
+      return;
+    }
+    const user = dotmocracies[room].members
+      .find(({ userId }) => userId === socket.client.id);
+    if (!user) {
+      socket.emit('msg', 'Unknown error');
+      return;
+    }
+    if (user.votesCast) {
+      socket.emit('msg', 'You have already begun voting');
+      return;
+    }
+
+    dotmocracies[room].decider = socket.client.id;
+    user.isDecider = true;
+    socket.emit('set decider', socket.client.id);
+    socket.in(room).emit('set decider', socket.client.id);
+  });
+
   socket.on('vote', (postit, coordinates) => {
     const room = getroom(socket.client.id);
     if (!room) {
@@ -227,15 +255,29 @@ dotmocracy.on('connection', (socket) => {
     }
     const user = dotmocracies[room].members
       .find(({ userId }) => userId === socket.client.id);
-    // TODO: check if the user is decider
-    if (user.votesCast >= dotmocracies[room].normalVotes) {
+    if (user.isDecider) {
+      const vote = { coordinates, decider: true };
+      // compare votesCast to deciderVotes
+      // add a decider vote rather than regular vote
+      if (user.votesCast >= dotmocracies[room].deciderVotes) {
+        socket.emit('msg', 'You have used your votes');
+        return;
+      }
+      user.votesCast += 1;
+      postitObj.dots.push(vote);
+      socket.emit('new vote', postit, vote);
+      socket.in(room).emit('new vote', postit, vote);
       return;
     }
-    const { dots } = postitObj;
-    dots.push(coordinates);
+    if (user.votesCast >= dotmocracies[room].normalVotes) {
+      socket.emit('msg', 'You have used your votes');
+      return;
+    }
+    const vote = { coordinates, decider: false };
     user.votesCast += 1;
-    socket.emit('new vote', postit, coordinates);
-    socket.in(room).emit('new vote', postit, coordinates);
+    postitObj.dots.push(vote);
+    socket.emit('new vote', postit, vote);
+    socket.in(room).emit('new vote', postit, vote);
   });
 
   socket.on('disconnect', () => {
@@ -250,8 +292,11 @@ dotmocracy.on('connection', (socket) => {
     if (room) {
       dotmocracies[room].members = dotmocracies[room].members
         .filter(({ userId }) => userId !== socket.client.id);
-
       socket.in(room).emit('remove user', socket.client.id);
+
+      if (dotmocracies[room].decider === socket.client.id) {
+        socket.in(room).emit('set decider', null);
+      }
 
       if (dotmocracies[room].members.length === 0) {
         delete dotmocracies[room];

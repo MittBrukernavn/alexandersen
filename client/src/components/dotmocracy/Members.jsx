@@ -22,16 +22,16 @@ const H2 = styled.h2`
 margin: 0px  0px;
 `;
 
-const Members = ({ members, decider, roomName }) => {
+const Members = ({ members, roomName }) => {
   const [expand, setExpand] = useState(false);
   if (expand) {
     return (
       <Wrapper>
         <H2>Connected users: </H2>
         <Ul>
-          {members.map(({ userId, name }) => (
+          {members.map(({ userId, name, isDecider }) => (
             <li key={userId}>
-              {userId === decider
+              {isDecider
                 ? <Decider>{name}</Decider>
                 : name}
             </li>
@@ -54,13 +54,9 @@ Members.propTypes = {
     userId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     votesCast: PropTypes.number.isRequired,
+    isDecider: PropTypes.bool.isRequired,
   })).isRequired,
   roomName: PropTypes.string.isRequired,
-  decider: PropTypes.string,
-};
-
-Members.defaultProps = {
-  decider: null,
 };
 
 export default Members;

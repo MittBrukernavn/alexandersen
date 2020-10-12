@@ -54,10 +54,12 @@ const Postit = ({ postit, socket }) => {
     ctx.fill();
     ctx.stroke();
 
-    dots.forEach(([x, y]) => {
+    dots.forEach(({ coordinates: [x, y], decider }) => {
+      const color = decider ? 'red' : 'blue';
+      const radius = decider ? 8 : 4;
       ctx.beginPath();
-      ctx.fillStyle = 'blue';
-      ctx.arc(x, y, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
       ctx.fill();
     });
   }, [postit, dots]);
@@ -75,7 +77,10 @@ Postit.propTypes = {
   postit: PropTypes.shape({
     text: PropTypes.string.isRequired,
     dots: PropTypes.arrayOf(
-      PropTypes.arrayOf(PropTypes.number),
+      PropTypes.shape({
+        coordinates: PropTypes.arrayOf(PropTypes.number),
+        decider: PropTypes.bool.isRequired,
+      }),
     ).isRequired,
   }).isRequired,
   // eslint-disable-next-line react/forbid-prop-types

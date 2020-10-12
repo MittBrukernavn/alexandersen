@@ -105,6 +105,6 @@ Setup.propTypes = {
 
 Setup.defaultProps = {
   initialRoomName: '',
-}
+};
 
 export default Setup;

@@ -28,7 +28,7 @@ const Dotmocracy = () => {
     decider: null,
   });
 
-  const initialRoomName = (new URL(window.location.href)).searchParams.get('room');
+  const initialRoomName = (new URL(window.location.href)).searchParams.get('room') || undefined;
 
   useEffect(() => {
     socket.on('msg', console.log);
@@ -66,6 +66,14 @@ const Dotmocracy = () => {
         return postitsCopy;
       });
     });
+
+    socket.on('set decider', (deciderId) => {
+      setRoomInfo((prev) => ({ ...prev, decider: deciderId }));
+      setMembers((prev) => prev.map((member) => ({
+        ...member,
+        isDecider: member.userId === deciderId,
+      })));
+    });
   }, []);
 
   if (phase === 'setup') {
@@ -77,10 +85,13 @@ const Dotmocracy = () => {
   return (
     <Background>
       <Body>
-        <Members members={members} decider={roomInfo.decider} roomName={roomInfo.name} />
+        <Members members={members} roomName={roomInfo.name} />
         <RowWrap>
           {postits.map((p) => <Postit key={p.text} postit={p} socket={socket} />)}
         </RowWrap>
+        {!roomInfo.decider
+          ? <button type="button" onClick={() => socket.emit('decider signup')}>Become decider</button>
+          : null}
         <MakePostit socket={socket} />
       </Body>
     </Background>
