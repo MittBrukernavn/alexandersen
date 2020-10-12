@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import copyToClipboard from '../../utils/copyToClipboard';
+
 const Wrapper = styled.div`
 text-align: left;
 margin: auto;
@@ -20,7 +22,7 @@ const H2 = styled.h2`
 margin: 0px  0px;
 `;
 
-const Members = ({ members, decider }) => {
+const Members = ({ members, decider, roomName }) => {
   const [expand, setExpand] = useState(false);
   if (expand) {
     return (
@@ -35,6 +37,7 @@ const Members = ({ members, decider }) => {
             </li>
           ))}
         </Ul>
+        <button type="button" onClick={() => copyToClipboard(`https://${document.domain}/dotmocracy?room=${roomName}`)}>Copy invite link</button>
         <button type="button" onClick={() => setExpand(false)}>Hide users</button>
       </Wrapper>
     );
@@ -52,6 +55,7 @@ Members.propTypes = {
     name: PropTypes.string.isRequired,
     votesCast: PropTypes.number.isRequired,
   })).isRequired,
+  roomName: PropTypes.string.isRequired,
   decider: PropTypes.string,
 };
 

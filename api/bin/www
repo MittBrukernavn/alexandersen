@@ -150,6 +150,7 @@ dotmocracy.on('connection', (socket) => {
       votesCast: 0,
     };
     dotmocracies[room] = {
+      name: room,
       postits: [],
       members: [userData],
       normalVotes: normalVotes > 0 ? normalVotes : 5,

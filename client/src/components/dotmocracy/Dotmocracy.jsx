@@ -22,10 +22,13 @@ const Dotmocracy = () => {
   const [postits, setPostits] = useState([]);
   const [members, setMembers] = useState([]);
   const [roomInfo, setRoomInfo] = useState({
+    name: '',
     normalVotes: -1,
     deciderVotes: -1,
     decider: null,
   });
+
+  const initialRoomName = (new URL(window.location.href)).searchParams.get('room');
 
   useEffect(() => {
     socket.on('msg', console.log);
@@ -58,7 +61,7 @@ const Dotmocracy = () => {
         const postitsCopy = [...prev];
         const votedPostit = postitsCopy.find(({ text }) => text === votedPostitText);
         if (votedPostit) {
-          votedPostit.dots = [...votedPostit.dots, coords]; // TODO: use meaningful values
+          votedPostit.dots = [...votedPostit.dots, coords];
         }
         return postitsCopy;
       });
@@ -67,14 +70,14 @@ const Dotmocracy = () => {
 
   if (phase === 'setup') {
     return (
-      <Setup socket={socket} onFinish={() => setPhase('suggestions')} />
+      <Setup socket={socket} onFinish={() => setPhase('suggestions')} initialRoomName={initialRoomName} />
     );
   }
 
   return (
     <Background>
       <Body>
-        <Members members={members} decider={roomInfo.decider} />
+        <Members members={members} decider={roomInfo.decider} roomName={roomInfo.name} />
         <RowWrap>
           {postits.map((p) => <Postit key={p.text} postit={p} socket={socket} />)}
         </RowWrap>

@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import Background from '../general/Background';
 import Body from '../general/Body';
 
-const Setup = ({ socket, onFinish }) => {
+const Setup = ({ socket, onFinish, initialRoomName }) => {
   const [phase, setPhase] = useState('choose name');
   const [name, setName] = useState('');
-  const [roomName, setRoomName] = useState('');
+  const [roomName, setRoomName] = useState(initialRoomName);
   const [normalPersonVotes, setNormalPersonVotes] = useState(5);
   const [deciderVotes, setDeciderVotes] = useState(1);
 
@@ -22,7 +22,10 @@ const Setup = ({ socket, onFinish }) => {
     if (phase === 'done') {
       onFinish();
     }
-  }, [phase, onFinish]);
+    if (initialRoomName && phase === 'choose create or join room') {
+      socket.emit('join room', initialRoomName, setPhaseOnSuccess('done'));
+    }
+  }, [phase, initialRoomName, onFinish]);
 
   if (phase === 'choose name') {
     return (
@@ -97,6 +100,11 @@ Setup.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   socket: PropTypes.object.isRequired,
   onFinish: PropTypes.func.isRequired,
+  initialRoomName: PropTypes.string,
 };
+
+Setup.defaultProps = {
+  initialRoomName: '',
+}
 
 export default Setup;
