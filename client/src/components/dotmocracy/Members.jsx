@@ -37,7 +37,7 @@ const Members = ({ members, roomName }) => {
             </li>
           ))}
         </Ul>
-        <button type="button" onClick={() => copyToClipboard(`https://${document.domain}/dotmocracy?room=${roomName}`)}>Copy invite link</button>
+        <button type="button" onClick={() => copyToClipboard(`${window.location.origin}/dotmocracy?room=${encodeURIComponent(roomName)}`)}>Copy invite link</button>
         <button type="button" onClick={() => setExpand(false)}>Hide users</button>
       </Wrapper>
     );
