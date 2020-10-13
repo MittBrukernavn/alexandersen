@@ -119,7 +119,8 @@ dotmocracy.on('connection', (socket) => {
     }
   });
 
-  socket.on('create room', (room, normalVotes, deciderVotes, ack) => {
+  socket.on('create room', (room, normalVotes, deciderVotes, allowDeciderAfterVoting, ack) => {
+    console.log(allowDeciderAfterVoting);
     const userId = socket.client.id;
     const nameOfUser = names[userId];
     if (!nameOfUser) {
@@ -156,6 +157,7 @@ dotmocracy.on('connection', (socket) => {
       members: [userData],
       normalVotes: normalVotes > 0 ? normalVotes : 5,
       deciderVotes: deciderVotes > 0 ? deciderVotes : 1,
+      allowDeciderAfterVoting,
       decider: null,
     };
     socket.join(room);
@@ -232,13 +234,14 @@ dotmocracy.on('connection', (socket) => {
       socket.emit('msg', 'Unknown error');
       return;
     }
-    if (user.votesCast) {
+    if (user.votesCast && !dotmocracies[room].allowDeciderAfterVoting) {
       socket.emit('msg', 'You have already begun voting');
       return;
     }
 
     dotmocracies[room].decider = socket.client.id;
     user.isDecider = true;
+    user.votesCast = 0; // reset votes cast
     socket.emit('set decider', socket.client.id);
     socket.in(room).emit('set decider', socket.client.id);
   });

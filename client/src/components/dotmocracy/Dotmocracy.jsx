@@ -25,6 +25,7 @@ const Dotmocracy = () => {
     name: '',
     normalVotes: -1,
     deciderVotes: -1,
+    allowDeciderAfterVoting: false,
     decider: null,
   });
 

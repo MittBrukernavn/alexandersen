@@ -10,6 +10,7 @@ const Setup = ({ socket, onFinish, initialRoomName }) => {
   const [roomName, setRoomName] = useState(initialRoomName);
   const [normalPersonVotes, setNormalPersonVotes] = useState(5);
   const [deciderVotes, setDeciderVotes] = useState(1);
+  const [allowDeciderAfterVoting, setAllowDeciderAfterVoting] = useState(false);
 
   // creates a callback for setting the phase if the success parameter is set to true
   const setPhaseOnSuccess = (newPhase) => (success) => {
@@ -71,7 +72,11 @@ const Setup = ({ socket, onFinish, initialRoomName }) => {
             Votes for the decider:
             <input type="number" id="deciderVotes" value={deciderVotes} onChange={(e) => setDeciderVotes(e.target.value)} />
           </label>
-          <button type="button" onClick={() => socket.emit('create room', roomName, normalPersonVotes, deciderVotes, setPhaseOnSuccess('done'))}>
+          <label htmlFor="allowDeciderAfterVoting">
+            Allow people to vote before becoming decider?
+            <input type="checkbox" checked={allowDeciderAfterVoting} onChange={(e) => setAllowDeciderAfterVoting(e.target.checked)} />
+          </label>
+          <button type="button" onClick={() => socket.emit('create room', roomName, normalPersonVotes, deciderVotes, allowDeciderAfterVoting, setPhaseOnSuccess('done'))}>
             Create
           </button>
         </Body>
