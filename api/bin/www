@@ -158,6 +158,7 @@ dotmocracy.on('connection', (socket) => {
       normalVotes: normalVotes > 0 ? normalVotes : 5,
       deciderVotes: deciderVotes > 0 ? deciderVotes : 1,
       allowDeciderAfterVoting,
+      deciderVotesCast: 0,
       decider: null,
     };
     socket.join(room);
@@ -241,7 +242,6 @@ dotmocracy.on('connection', (socket) => {
 
     dotmocracies[room].decider = socket.client.id;
     user.isDecider = true;
-    user.votesCast = 0; // reset votes cast
     socket.emit('set decider', socket.client.id);
     socket.in(room).emit('set decider', socket.client.id);
   });
@@ -262,11 +262,11 @@ dotmocracy.on('connection', (socket) => {
       const vote = { coordinates, decider: true };
       // compare votesCast to deciderVotes
       // add a decider vote rather than regular vote
-      if (user.votesCast >= dotmocracies[room].deciderVotes) {
+      if (dotmocracies[room].deciderVotesCast >= dotmocracies[room].deciderVotes) {
         socket.emit('msg', 'You have used your votes');
         return;
       }
-      user.votesCast += 1;
+      dotmocracies[room].deciderVotesCast += 1;
       postitObj.dots.push(vote);
       socket.emit('new vote', postit, vote);
       socket.in(room).emit('new vote', postit, vote);
@@ -298,6 +298,7 @@ dotmocracy.on('connection', (socket) => {
       socket.in(room).emit('remove user', socket.client.id);
 
       if (dotmocracies[room].decider === socket.client.id) {
+        dotmocracies[room].decider = null;
         socket.in(room).emit('set decider', null);
       }
 
