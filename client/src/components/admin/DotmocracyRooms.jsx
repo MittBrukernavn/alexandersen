@@ -17,9 +17,7 @@ const DotmocracyRooms = () => {
         },
       };
       const res = await fetch('/api/dotmocracy', req);
-      console.log(res);
       const j = await res.json();
-      console.log(j); 
       setDotmocracies(j);
       setLoading(false);
     };
