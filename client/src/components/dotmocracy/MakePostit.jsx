@@ -6,7 +6,7 @@ const MakePostit = ({ socket }) => {
 
   return (
     <div>
-      <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea value={text} onChange={(e) => setText(e.target.value)} />
       <button
         type="button"
         onClick={() => socket.emit('make postit', text, (success) => {

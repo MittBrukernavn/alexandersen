@@ -10,6 +10,9 @@ const socketio = require('socket.io');
 
 const app = require('../app');
 
+const dotmocracies = require('../states/dotmocracies');
+const { adminOnly } = require('../middlewares');
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -100,7 +103,12 @@ const dotmocracy = io.of('/dotmocracy');
 
 // in-memory cause I don't need these to persist (that will be a project for another day)
 const names = {};
-const dotmocracies = {};
+
+app.use(adminOnly);
+
+app.get('/api/dotmocracy', (_req, res) => {
+  res.json(dotmocracies);
+});
 
 const getroom = (userid) => (
   Object.keys(dotmocracies).find((roomname) => (

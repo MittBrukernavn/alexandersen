@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const usersRouter = require('./routes/users');
 const bingoRouter = require('./routes/bingo');
+const dotmocracyRouter = require('./routes/dotmocracy');
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/users', usersRouter);
 app.use('/api/bingo', bingoRouter);
+
+app.use('/api/dotmocracy', dotmocracyRouter);
 
 // catch 404 and forward to error handler
 app.use((_req, _res, next) => {

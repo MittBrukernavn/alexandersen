@@ -14,6 +14,7 @@ const AdminPanel = () => (
       <a href="/admin/bingo"><li>Lag ny bingo</li></a>
       <a href="/admin/prompts"><li>Manage prompts</li></a>
       <a href="/admin/review"><li>Vurder forslag</li></a>
+      <a href="/admin/dotmocracy"><li>Se dotmocracy-rom</li></a>
     </ul>
   </Wrapper>
 );

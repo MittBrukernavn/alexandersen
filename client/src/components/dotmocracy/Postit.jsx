@@ -68,7 +68,7 @@ const Postit = ({ postit, socket }) => {
     <Wrapper>
       <Canvas height={canvasHeight} width={canvasWidth} ref={canvasRef} />
       <P onClick={handleClick}>{text}</P>
-      <p>{`${dots.length} votes`}</p>
+      <p>{`${dots.length} ${dots.length === 1 ? 'vote' : 'votes'}`}</p>
     </Wrapper>
   );
 };

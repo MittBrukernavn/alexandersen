@@ -16,6 +16,7 @@ import AdminPanel from './components/admin/AdminPanel';
 import NewBingo from './components/admin/NewBingo';
 import Prompts from './components/admin/Prompts';
 import ReviewRequests from './components/admin/ReviewRequests';
+import DotmocracyRooms from './components/admin/DotmocracyRooms';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
       <Route path="/admin/bingo" component={NewBingo} />
       <Route path="/admin/prompts" component={Prompts} />
       <Route path="/admin/review" component={ReviewRequests} />
+      <Route path="/admin/dotmocracy" component={DotmocracyRooms} />
     </Router>
   );
 }
