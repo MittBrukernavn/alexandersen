@@ -1,15 +1,15 @@
 const dotmocracies = require('../states/dotmocracies');
 
+// in-memory cause I don't need these to persist (that will be a project for another day)
+const names = {};
+
+const getroom = (userid) => (
+  Object.keys(dotmocracies).find((roomname) => (
+    dotmocracies[roomname].members.find(({ userId }) => userId === userid)))
+);
+
 const dotmocracySetup = (io) => {
   const dotmocracy = io.of('/dotmocracy');
-
-  // in-memory cause I don't need these to persist (that will be a project for another day)
-  const names = {};
-
-  const getroom = (userid) => (
-    Object.keys(dotmocracies).find((roomname) => (
-      dotmocracies[roomname].members.find(({ userId }) => userId === userid)))
-  );
 
   dotmocracy.on('connection', (socket) => {
     socket.on('name', (name, ack) => {
@@ -28,9 +28,9 @@ const dotmocracySetup = (io) => {
     });
 
     socket.on('create room', (room, normalVotes, deciderVotes, allowDeciderAfterVoting, ack) => {
+      const userId = socket.client.id;
+      const nameOfUser = names[userId];
       try {
-        const userId = socket.client.id;
-        const nameOfUser = names[userId];
         if (!nameOfUser) {
           socket.emit('msg', 'No name found for your user id');
           ack(false);

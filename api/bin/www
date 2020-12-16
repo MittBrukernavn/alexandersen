@@ -10,6 +10,7 @@ const socketio = require('socket.io');
 
 const app = require('../app');
 const dotmocracySetup = require('../sockets/dotmocracySetup');
+const codenamesSetup = require('../sockets/codenamesSetup');
 
 /**
  * Normalize a port into a number, string, or false.
@@ -96,3 +97,4 @@ server.on('listening', onListening);
 // websocket handler for dotmocracy
 const io = socketio.listen(server);
 dotmocracySetup(io);
+codenamesSetup(io);
