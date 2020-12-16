@@ -10,6 +10,7 @@ import Snake from './components/snake/Snake';
 import Minesweeper from './components/minesweeper/Minesweeper';
 import NeuralNets from './components/neural-nets/NeuralNets';
 import Dotmocracy from './components/dotmocracy/Dotmocracy';
+import Codenames from './components/codenames/Codenames';
 
 import Login from './components/admin/Login';
 import AdminPanel from './components/admin/AdminPanel';
@@ -17,6 +18,7 @@ import NewBingo from './components/admin/NewBingo';
 import Prompts from './components/admin/Prompts';
 import ReviewRequests from './components/admin/ReviewRequests';
 import DotmocracyRooms from './components/admin/DotmocracyRooms';
+
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
       <Route path="/minesweeper" component={Minesweeper} />
       <Route path="/snake" component={Snake} />
       <Route path="/dotmocracy" component={Dotmocracy} />
+      <Route path="/codenames" component={Codenames} />
       <Route path="/admin" exact component={() => <Redirect to="/admin/login" />} />
       <Route path="/admin/login" component={Login} />
       <Route path="/admin/main" component={AdminPanel} />
