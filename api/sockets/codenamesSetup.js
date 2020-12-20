@@ -55,6 +55,18 @@ const isUserInRoom = (userId, roomName) => codenamesRooms[roomName].players[user
 const getRoom = (userId) => (
   Object.keys(codenamesRooms).find((roomName) => isUserInRoom(userId, roomName)));
 
+const getSanitizedRoom = (roomName) => {
+  const room = codenamesRooms[roomName];
+  const sanitizedRoom = { ...room };
+  sanitizedRoom.board = room.board.map((row) => row.map((tile) => {
+    const sanitizedTile = { ...tile };
+    if (!sanitizedTile.visible) {
+      sanitizedTile.color = undefined;
+    }
+    return sanitizedTile;
+  }));
+};
+
 const codenamesSetup = (io) => {
   const codenames = io.of('/codenames');
 
@@ -86,8 +98,10 @@ const codenamesSetup = (io) => {
         socket.emit('create room error', 'You need to name your new room');
         return;
       }
-      if (codenamesRooms[roomName] !== undefined) {
-        socket.emit('create room error', 'Room with that name already exists');
+      // avoid people choosing a player's ID as room name, in case we want to use direct messages
+      // (more of a future-proofing measure than anything)
+      if (codenamesRooms[roomName] !== undefined || names[roomName] !== undefined) {
+        socket.emit('create room error', 'Room name is not available');
         return;
       }
       // reserve room name (generation may take some time)
@@ -97,7 +111,6 @@ const codenamesSetup = (io) => {
         socket.leave(existingRoom);
       }
       socket.join(roomName);
-      // TODO: add room to state
       const players = {};
       players[userId] = {
         name: userName,
@@ -107,9 +120,10 @@ const codenamesSetup = (io) => {
       codenamesRooms[roomName] = {
         board: generateBoard(5, 8, 9),
         players,
-        turn: 'blue',
+        turn: 'blue', // blue's turn
+        phase: 'hint', // spymaster is up to give a hint
       };
-      socket.emit('create room success', roomName);
+      socket.emit('create room success', roomName, getSanitizedRoom(roomName));
     });
 
 
@@ -121,7 +135,7 @@ const codenamesSetup = (io) => {
         return;
       }
       if (codenamesRooms[roomName] === undefined) {
-        socket.emit('join room error', 'Room with that name already exists');
+        socket.emit('join room error', 'No room with this name exists');
         return;
       }
       const existingRoom = getRoom(userId);
@@ -130,10 +144,13 @@ const codenamesSetup = (io) => {
       }
       // TODO: update room in state
       codenamesRooms[roomName].players[userId] = {
-
+        name: userName,
+        team: null,
+        spymaster: false,
       };
       socket.join(roomName);
-      socket.emit('join room success', roomName);
+      socket.emit('join room success', roomName, getSanitizedRoom(roomName));
+      socket.to(roomName).emit('new player', codenamesRooms[roomName].players[userId]);
     });
 
     socket.on('join team', (team) => {
@@ -150,6 +167,223 @@ const codenamesSetup = (io) => {
       codenamesRooms[room].players[userId].team = team;
       socket.emit('join team success', team);
       socket.to(room).emit('team change', socket.client.id, team);
+    });
+
+    socket.on('become spymaster', () => {
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('become spymaster error', 'No room joined');
+        return;
+      }
+
+      const room = codenamesRooms[roomName];
+      if (room.players[userId].team === null) {
+        socket.emit('become spymaster error', 'No team selected');
+        return;
+      }
+
+      room.players[userId].spymaster = true;
+      socket.emit('become spymaster success', room);
+      socket.to(roomName).emit('new spymaster', userId);
+    });
+
+    socket.on('give hint', (hint, count) => {
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('give hint error', 'No room joined');
+        return;
+      }
+
+      const room = codenamesRooms[roomName];
+      const { turn, phase, players } = room;
+      if (phase !== 'hint') {
+        socket.emit('give hint error', 'It is the operatives\' turn to guess');
+        return;
+      }
+      const { team, spymaster } = players[userId];
+      if (team !== turn) {
+        socket.emit('give hint error', 'It is not your turn');
+        return;
+      }
+      if (!spymaster) {
+        socket.emit('give hint error', 'You are not a spymaster');
+        return;
+      }
+      room.phase = 'guess';
+      socket.emit('new hint', userId, hint, count);
+      socket.to(roomName).emit('new hint', userId, hint, count);
+    });
+
+    socket.on('hover card', (row, col) => {
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('hover card error', '');
+        return;
+      }
+
+      const room = codenamesRooms[roomName];
+      const {
+        phase, turn, players, board,
+      } = room;
+      const player = players[userId];
+      const { team, spymaster } = player;
+
+      if (spymaster) {
+        socket.emit('hover card error', 'You are a spymaster');
+        return;
+      }
+      if (phase !== 'guess') {
+        socket.emit('hover card error', 'Wait for the spymaster to give a hint');
+        return;
+      }
+      if (turn !== team) {
+        socket.emit('hover card error', 'It is the opposing team\'s turn');
+        return;
+      }
+      try {
+        const tile = board[row][col];
+        const index = tile.hovers.indexOf(userId);
+        if (index !== -1) {
+          tile.hovers.splice(index, 1);
+          socket.emit('remove hover', row, col, userId);
+          socket.to(roomName).emit('remove hover', row, col, userId);
+        } else {
+          tile.hovers.push(userId);
+          socket.emit('add hover', row, col, userId);
+          socket.to(roomName).emit('add hover', row, col, userId);
+        }
+      } catch (err) {
+        socket.emit('hover card error', 'An unexpected error occurred');
+      }
+    });
+
+    socket.on('choose card', (row, col) => {
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('choose card error', 'No room joined');
+        return;
+      }
+      const room = codenamesRooms[roomName];
+      const {
+        phase, turn, players, board,
+      } = room;
+      const player = players[userId];
+      const { team, spymaster } = player;
+      if (phase !== 'guess') {
+        socket.emit('choose card error', 'Wait for the spymaster to give a hint');
+        return;
+      }
+      if (turn !== team.turn) {
+        socket.emit('choose card error', 'It is not your team\'s turn');
+        return;
+      }
+      if (spymaster) {
+        socket.emit('choose card error', 'Please let your operatives choose');
+        return;
+      }
+      try {
+        const tile = board[row][col];
+        const otherTeam = team === 'red' ? 'blue' : 'red';
+        socket.emit('reveal', row, col, tile.color);
+        socket.to(roomName).emit('reveal', row, col, tile.color);
+        tile.visible = true;
+        if (tile.color === 'black') {
+          socket.emit('game over', otherTeam);
+          socket.to(roomName).emit('game over', otherTeam);
+          room.turn = 'game over';
+          return;
+        }
+        if (tile.color === team) {
+          // TODO: add guess limit
+          const remainingTiles = board.find((rowInBoard) => rowInBoard
+            .find(({ color, visible }) => !visible && color === team));
+          if (!remainingTiles) {
+            socket.emit('game over', team);
+            socket.to(roomName).emit('game over', team);
+            room.turn = 'game over';
+          }
+        } else {
+          const remainingTiles = board.find((rowInBoard) => rowInBoard
+            .find(({ color, visible }) => !visible && color === otherTeam));
+          if (!remainingTiles) {
+            socket.emit('game over', otherTeam);
+            socket.to(roomName).emit('game over', otherTeam);
+            room.turn = 'game over';
+          } else {
+            room.turn = otherTeam;
+            room.phase = 'hint';
+            socket.emit('begin turn', otherTeam);
+            socket.to(roomName).emit('begin turn', otherTeam);
+          }
+        }
+      } catch (err) {
+        socket.emit('choose card error', 'An unexpected error occurred');
+      }
+    });
+
+    socket.on('end guessing', () => {
+      // check that the player is on the right team, not spymaster, and it is the guessing round
+      // emit a "begin turn" message
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('choose card error', 'No room joined');
+        return;
+      }
+      const room = codenamesRooms[roomName];
+      const {
+        phase, turn, players,
+      } = room;
+      const player = players[userId];
+      const { team, spymaster } = player;
+      if (phase !== 'guess') {
+        socket.emit('end guessing error', 'Wait for the spymaster to give a hint');
+        return;
+      }
+      if (turn !== team.turn) {
+        socket.emit('end guessing error', 'It is not your team\'s turn');
+        return;
+      }
+      if (spymaster) {
+        socket.emit('end guessing error', 'Kindly allow your operatives to choose when to stop.');
+        return;
+      }
+      const otherTeam = team === 'red' ? 'blue' : 'red';
+      room.turn = otherTeam;
+      room.phase = 'hint';
+      socket.emit('begin turn', otherTeam);
+      socket.to(roomName).emit('begin turn', otherTeam);
+    });
+
+    socket.on('new game', () => {
+      // only allow beginning new games if the old game is over
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (!roomName) {
+        socket.emit('new game error', 'No room joined');
+        return;
+      }
+      const room = codenamesRooms[roomName];
+      if (room.turn !== 'game over') {
+        socket.emit('new game error', 'A game is in progress');
+        return;
+      }
+      Object.keys(room.players).forEach((playerId) => {
+        room.players[playerId].spymaster = false;
+      });
+      room.board = generateBoard(5, 8, 9);
+      room.turn = 'blue';
+      socket.emit('new game', getSanitizedRoom(roomName));
+      socket.to(roomName).emit('new game', getSanitizedRoom(roomName));
+    });
+
+    socket.on('disconnect', () => {
+      // TODO: remove players when they disconnect.
+      // TODO: if their room is now empty, delete it
     });
   });
 };
