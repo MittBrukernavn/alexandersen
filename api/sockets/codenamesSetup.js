@@ -65,6 +65,7 @@ const getSanitizedRoom = (roomName) => {
     }
     return sanitizedTile;
   }));
+  return sanitizedRoom;
 };
 
 const codenamesSetup = (io) => {
@@ -104,12 +105,12 @@ const codenamesSetup = (io) => {
         socket.emit('create room error', 'Room name is not available');
         return;
       }
-      // reserve room name (generation may take some time)
-      codenamesRooms[roomName] = {};
       const existingRoom = getRoom(userId);
       if (existingRoom) {
         socket.leave(existingRoom);
       }
+      // reserve room name (generation may take some time)
+      codenamesRooms[roomName] = {};
       socket.join(roomName);
       const players = {};
       players[userId] = {
@@ -390,9 +391,9 @@ const codenamesSetup = (io) => {
       const roomName = getRoom(userId);
       if (roomName) {
         const room = codenamesRooms[roomName];
-        room.players = room.players.filter(({ userId: otherUser }) => userId === otherUser);
+        delete room.players[userId];
         socket.to(roomName).emit('remove player', userId);
-        if (room.players.length === 0) {
+        if (Object.keys(room.players).length === 0) {
           delete codenamesRooms[roomName];
         }
       }

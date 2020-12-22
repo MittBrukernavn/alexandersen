@@ -4,25 +4,44 @@ import io from 'socket.io-client';
 import Body from '../general/Body';
 import Background from '../general/Background';
 import Setup from './Setup';
+import Board from './Board';
+import copyToClipboard from '../../utils/copyToClipboard';
 
 const socket = io('/codenames');
 
 const Codenames = () => {
   const [roomName, setRoomName] = useState('');
   const [myId, setMyId] = useState('');
-  const [game, setGame] = useState(null);
+  const [board, setBoard] = useState([]);
+  const [players, setPlayers] = useState({});
+  const [turn, setTurn] = useState('');
+  const [phase, setPhase] = useState('');
+  // const [hints, setHints] = useState([]);
   const [name, setName] = useState('');
 
   useEffect(() => {
     socket.on('self name', (newName) => setName(newName));
-    socket.on('name change', () => null); // TODO: handle other user changing name
+    socket.on('name change', () => null); // TODO: handle other user changing name (userId, newName)
     socket.on('create room success', (newRoomName, room, id) => {
-      setGame(room);
+      const {
+        board: b, players: p, turn: t, phase: ph,
+      } = room;
+      setBoard(b);
+      setPlayers(p);
+      setTurn(t);
+      setPhase(ph);
       setRoomName(newRoomName);
       setMyId(id);
+      console.log(room);
     });
     socket.on('join room success', (newRoomName, room, id) => {
-      setGame(room);
+      const {
+        board: b, players: p, turn: t, phase: ph,
+      } = room;
+      setBoard(b);
+      setPlayers(p);
+      setTurn(t);
+      setPhase(ph);
       setRoomName(newRoomName);
       setMyId(id);
     });
@@ -30,17 +49,33 @@ const Codenames = () => {
       // TODO: essentially just add game.players[userId] = user;
     });
     socket.on('join team error', console.log);
-    socket.on('join team success', (/* team */) => {
-      // TODO: game.players[myId].team = team;
+    socket.on('join team success', (team) => {
+      setPlayers((prev) => {
+        const copy = { ...prev };
+        copy[myId].team = team;
+        return copy;
+      });
     });
     socket.on('team change', (/* userId, team */) => {
       // TODO: game.players[userId].team = team;
     });
     socket.on('become spymaster success', (room) => {
-      setGame(room);
+      const {
+        board: b,
+      } = room;
+      setBoard(b);
+      setPlayers((prev) => {
+        const copy = { ...prev };
+        copy[myId].spymaster = true;
+        return copy;
+      });
     });
-    socket.on('new spymaster', (/* userId */) => {
-      // TODO: game.players[userId].spymaster = true;
+    socket.on('new spymaster', (userId) => {
+      setPlayers((prev) => {
+        const copy = { ...prev };
+        copy[userId].spymaster = true;
+        return copy;
+      });
     });
     socket.on('new hint', (/* userId, hint, count */) => {
       // set game phase to 'guess'
@@ -64,18 +99,31 @@ const Codenames = () => {
       // make some display of who won
     });
     socket.on('new game', (room) => {
-      setGame(room);
+      const {
+        board: b, players: p, turn: t, phase: ph,
+      } = room;
+      setBoard(b);
+      setPlayers(p);
+      setTurn(t);
+      setPhase(ph);
     });
-  }, []);
+  }, [socket]);
 
-  if (!game) {
+  if (!board.length) {
     return <Setup socket={socket} />;
   }
 
   return (
     <Background>
       <Body>
-        Codenames :)
+        <p>
+          {`Welcome to Codenames, ${name}`}
+        </p>
+        <p>
+          {`It is ${turn}'s turn to ${phase}`}
+        </p>
+        <button type="button" onClick={() => copyToClipboard(`https://${document.domain}/codenames?room=${roomName}`)}>Copy invite link</button>
+        <Board board={board} players={players} />
       </Body>
     </Background>
   );
