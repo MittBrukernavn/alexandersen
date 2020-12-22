@@ -123,7 +123,7 @@ const codenamesSetup = (io) => {
         turn: 'blue', // blue's turn
         phase: 'hint', // spymaster is up to give a hint
       };
-      socket.emit('create room success', roomName, getSanitizedRoom(roomName));
+      socket.emit('create room success', roomName, getSanitizedRoom(roomName), userId);
     });
 
 
@@ -141,16 +141,16 @@ const codenamesSetup = (io) => {
       const existingRoom = getRoom(userId);
       if (existingRoom) {
         socket.leave(existingRoom);
+        // TODO: remove user from other game rooms, and inform players
       }
-      // TODO: update room in state
       codenamesRooms[roomName].players[userId] = {
         name: userName,
         team: null,
         spymaster: false,
       };
       socket.join(roomName);
-      socket.emit('join room success', roomName, getSanitizedRoom(roomName));
-      socket.to(roomName).emit('new player', codenamesRooms[roomName].players[userId]);
+      socket.emit('join room success', roomName, getSanitizedRoom(roomName), userId);
+      socket.to(roomName).emit('new player', userId, codenamesRooms[roomName].players[userId]);
     });
 
     socket.on('join team', (team) => {
@@ -166,7 +166,7 @@ const codenamesSetup = (io) => {
       }
       codenamesRooms[room].players[userId].team = team;
       socket.emit('join team success', team);
-      socket.to(room).emit('team change', socket.client.id, team);
+      socket.to(room).emit('team change', userId, team);
     });
 
     socket.on('become spymaster', () => {
@@ -187,6 +187,8 @@ const codenamesSetup = (io) => {
       socket.emit('become spymaster success', room);
       socket.to(roomName).emit('new spymaster', userId);
     });
+
+    // TODO: add possibility to quit being spymaster
 
     socket.on('give hint', (hint, count) => {
       const userId = socket.client.id;
@@ -331,7 +333,7 @@ const codenamesSetup = (io) => {
       const userId = socket.client.id;
       const roomName = getRoom(userId);
       if (!roomName) {
-        socket.emit('choose card error', 'No room joined');
+        socket.emit('end guessing error', 'No room joined');
         return;
       }
       const room = codenamesRooms[roomName];
@@ -384,6 +386,17 @@ const codenamesSetup = (io) => {
     socket.on('disconnect', () => {
       // TODO: remove players when they disconnect.
       // TODO: if their room is now empty, delete it
+      const userId = socket.client.id;
+      const roomName = getRoom(userId);
+      if (roomName) {
+        const room = codenamesRooms[roomName];
+        room.players = room.players.filter(({ userId: otherUser }) => userId === otherUser);
+        socket.to(roomName).emit('remove player', userId);
+        if (room.players.length === 0) {
+          delete codenamesRooms[roomName];
+        }
+      }
+      delete names[userId];
     });
   });
 };

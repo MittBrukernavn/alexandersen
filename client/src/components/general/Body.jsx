@@ -7,7 +7,7 @@ const Body = styled.div`
   max-width: ${(props) => props.maxWidth || '50em'};
   min-height: 20em;
   background-color: white;
-  margin: 0.5em auto;
+  margin: 0 auto;
   border-radius: 1em;
   padding: 0.5em;
 `;
