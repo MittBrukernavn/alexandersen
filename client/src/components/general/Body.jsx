@@ -5,7 +5,7 @@ const Body = styled.div`
   flex-flow: column;
   width: 90vw;
   max-width: ${(props) => props.maxWidth || '50em'};
-  min-height: 20em;
+  min-height: ${(props) => props.minHeight || '20em'};
   background-color: white;
   margin: 0 auto;
   border-radius: 1em;

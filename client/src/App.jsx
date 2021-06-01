@@ -11,6 +11,7 @@ import Minesweeper from './components/minesweeper/Minesweeper';
 import NeuralNets from './components/neural-nets/NeuralNets';
 import Dotmocracy from './components/dotmocracy/Dotmocracy';
 import Codenames from './components/codenames/Codenames';
+import Pacdog from './components/pacdog/Pacdog';
 
 import Login from './components/admin/Login';
 import AdminPanel from './components/admin/AdminPanel';
@@ -32,6 +33,7 @@ function App() {
       <Route path="/snake" component={Snake} />
       <Route path="/dotmocracy" component={Dotmocracy} />
       <Route path="/codenames" component={Codenames} />
+      <Route path="/pacdog" component={Pacdog} />
       <Route path="/admin" exact component={() => <Redirect to="/admin/login" />} />
       <Route path="/admin/login" component={Login} />
       <Route path="/admin/main" component={AdminPanel} />

@@ -5,6 +5,16 @@ import Background from '../general/Background';
 import PageIndex from '../general/PageIndex';
 
 const pages = [
+  // {
+  //  title: '[WIP] Pacdog',
+  //  href: '/pacdog',
+  //  description: 'Name should say it all',
+  // },
+  {
+    title: '[WIP] Codenames',
+    href: '/codenames',
+    description: 'A simple implementation of the codenames game - currently missing a lot of frontend work.',
+  },
   {
     title: 'Dotmocracy',
     href: '/dotmocracy',
