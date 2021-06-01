@@ -95,6 +95,6 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 // websocket handler for dotmocracy
-const io = socketio.listen(server);
+const io = socketio(server);
 dotmocracySetup(io);
 codenamesSetup(io);
