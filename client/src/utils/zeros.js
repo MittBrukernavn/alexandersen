@@ -4,6 +4,6 @@ const zeros = (n) => {
     result.push(0);
   }
   return result;
-}
+};
 
 export default zeros;

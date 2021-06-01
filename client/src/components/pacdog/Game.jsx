@@ -15,6 +15,7 @@ flex-flow: column nowrap;
 
 const Game = () => {
   const { width, height } = useWindowDimensions();
+  // eslint-disable-next-line
   const [direction, setDirection] = useState(null);
 
   if (width < height) {
