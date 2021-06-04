@@ -9,7 +9,7 @@ const pages = [
     title: 'Yelp',
     href: '/nn/yelp',
     description: `A neural network trying to classify positive and negative reviews, trained on
-      yelp reviews. I am currently working on parsing the full yelp dataset in order to (ideally)
+      yelp reviews. Based on an assignment in TDT4171 - Artificial Intelligence Methods, spring 2020. I am currently working on parsing the full yelp dataset in order to (ideally)
       make the model even more robust`,
   },
   {
