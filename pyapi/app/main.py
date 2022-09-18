@@ -8,12 +8,13 @@ def pyapi():
     return 'Hello World!'
 
 
-yelp_model = load_model('yelp-model')
+# yelp_model = load_model('yelp-model')
 @app.route('/pyapi/yelp/<path:text>')
 def yelp(text):
-    print(text)
-    prob = yelp_model.predict([text])[0][0]
-    return f'{prob}'
+    # print(text)
+    # prob = yelp_model.predict([text])[0][0]
+    # return f'{prob}'
+    return 'Yelp model currently unavailable'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
