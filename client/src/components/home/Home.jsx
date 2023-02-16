@@ -49,7 +49,6 @@ const pages = [
   },
 ];
 
-
 const H1 = styled.h1`
   font-size: 2em;
   margin: 0px;

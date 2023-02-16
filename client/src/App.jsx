@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
-
 import Home from './components/home/Home';
 import Bingo from './components/bingo/Bingo';
 import BingoRequest from './components/bingo/BingoRequest';
@@ -19,7 +18,6 @@ import NewBingo from './components/admin/NewBingo';
 import Prompts from './components/admin/Prompts';
 import ReviewRequests from './components/admin/ReviewRequests';
 import DotmocracyRooms from './components/admin/DotmocracyRooms';
-
 
 function App() {
   return (

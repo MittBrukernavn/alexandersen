@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import Background from '../general/Background';
 import PageIndex from '../general/PageIndex';
 

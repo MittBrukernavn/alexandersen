@@ -6,7 +6,6 @@ import DrawingCanvas from './DrawingCanvas';
 import Background from '../../general/Background';
 import Body from '../../general/Body';
 
-
 const MNIST = () => {
   const [model, setModel] = useState(null);
   const [pixels, setPixels] = useState(zeros(784));
